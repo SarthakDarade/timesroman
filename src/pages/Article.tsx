@@ -74,7 +74,7 @@ const mockArticles = {
     category: 'Politics',
     date: 'April 14, 2025',
     author: 'James Wilson',
-    imageUrl: 'https://images.unsplash.com/photo-1618477202872-5cfd2bede46e?auto=format&fit=crop&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&q=80',
     readTime: '6 min',
   },
   // Add more mock articles as needed
