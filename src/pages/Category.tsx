@@ -1,10 +1,11 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ArticleCard from '../components/ArticleCard';
 import { Button } from '@/components/ui/button';
+import { Filter, SlidersHorizontal } from 'lucide-react';
 
 // Mock category articles data
 const mockCategoryArticles = {
@@ -247,6 +248,15 @@ const categoryTitles: Record<string, string> = {
   entertainment: "Entertainment",
 };
 
+const categoryDescriptions: Record<string, string> = {
+  politics: "Stay informed with the latest political developments, policy changes, and governance updates from around the world.",
+  technology: "Discover cutting-edge innovations, digital trends, and tech industry news that are shaping our future.",
+  business: "Track market movements, corporate strategies, and economic shifts that impact the global business landscape.",
+  science: "Explore the latest discoveries, research breakthroughs, and scientific advancements across various disciplines.",
+  health: "Find valuable information on medical research, wellness trends, and healthcare developments for a healthier lifestyle.",
+  entertainment: "Keep up with the latest in movies, music, television, celebrity news, and cultural phenomena.",
+};
+
 const Category = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
   const normalizedCategoryId = categoryId?.toLowerCase() || '';
@@ -255,37 +265,146 @@ const Category = () => {
     : [];
   
   const categoryTitle = categoryId ? categoryTitles[normalizedCategoryId] || categoryId : '';
+  const categoryDescription = categoryId ? categoryDescriptions[normalizedCategoryId] || '' : '';
+  
+  const [visibleArticles, setVisibleArticles] = useState(6);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [sortBy, setSortBy] = useState('latest');
+  
+  useEffect(() => {
+    // Scroll to top when category changes
+    window.scrollTo(0, 0);
+    
+    // Reset visible articles count
+    setVisibleArticles(6);
+    
+    // Set page title
+    document.title = `${categoryTitle} | Times Roman`;
+    
+    return () => {
+      document.title = 'Times Roman'; // Reset title on unmount
+    };
+  }, [categoryId, categoryTitle]);
+  
+  const loadMore = () => {
+    setVisibleArticles((prev) => prev + 3);
+  };
+  
+  const toggleFilter = () => {
+    setFilterOpen(!filterOpen);
+  };
+  
+  const handleSortChange = (method: string) => {
+    setSortBy(method);
+    // In a real implementation, you would sort the articles here
+  };
+  
+  // Get the appropriate gradient class for the category header
+  const getCategoryGradientClass = () => {
+    switch (normalizedCategoryId) {
+      case 'technology': return 'from-purple-600 to-indigo-600';
+      case 'business': return 'from-emerald-600 to-teal-600';
+      case 'politics': return 'from-indigo-600 to-blue-600';
+      case 'health': return 'from-orange-600 to-amber-600';
+      case 'science': return 'from-cyan-600 to-sky-600';
+      case 'entertainment': return 'from-pink-600 to-rose-600';
+      default: return 'from-gray-700 to-gray-900';
+    }
+  };
 
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
       
-      <main className="flex-1 py-8">
-        <div className="container mx-auto px-4">
-          <header className="mb-8">
-            <h1 className="font-serif text-3xl font-bold md:text-4xl">{categoryTitle}</h1>
-            <p className="mt-2 text-gray-600">Latest news and updates in {categoryTitle.toLowerCase()}</p>
-          </header>
-          
-          {articles.length > 0 ? (
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {articles.map((article) => (
-                <ArticleCard key={article.id} {...article} />
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-12">
-              <h2 className="text-2xl font-bold">No articles found</h2>
-              <p className="mt-2 text-gray-600">There are no articles in this category yet.</p>
-            </div>
-          )}
-          
-          {articles.length > 0 && (
-            <div className="mt-8 flex justify-center">
-              <Button variant="outline">Load More Articles</Button>
-            </div>
-          )}
+      <main className="flex-1">
+        {/* Category Header with colored gradient background */}
+        <div className={`bg-gradient-to-r ${getCategoryGradientClass()} text-white py-12 animate-[fadeIn_0.5s_ease-in-out]`}>
+          <div className="container mx-auto px-4">
+            <h1 className="font-serif text-4xl font-bold md:text-5xl">{categoryTitle}</h1>
+            <p className="mt-3 max-w-2xl text-lg text-white/90">{categoryDescription}</p>
+          </div>
         </div>
+        
+        {/* Filter and Sort Section */}
+        <div className="bg-gray-50 py-4 border-b">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="flex items-center gap-2"
+                  onClick={toggleFilter}
+                >
+                  <Filter size={16} />
+                  Filter
+                </Button>
+                
+                {filterOpen && (
+                  <div className="ml-4 flex items-center gap-2">
+                    <span className="text-sm text-gray-500">Sort by:</span>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant={sortBy === 'latest' ? 'default' : 'outline'} 
+                        size="sm"
+                        onClick={() => handleSortChange('latest')}
+                      >
+                        Latest
+                      </Button>
+                      <Button 
+                        variant={sortBy === 'popular' ? 'default' : 'outline'} 
+                        size="sm"
+                        onClick={() => handleSortChange('popular')}
+                      >
+                        Popular
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              <div className="text-sm text-gray-500">
+                Showing {Math.min(visibleArticles, articles.length)} of {articles.length} articles
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Articles Section */}
+        <section className="py-8">
+          <div className="container mx-auto px-4">
+            {articles.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 stagger-animate">
+                  {articles.slice(0, visibleArticles).map((article, index) => (
+                    <ArticleCard 
+                      key={article.id} 
+                      {...article} 
+                      className="fade-in-element" 
+                      style={{animationDelay: `${index * 0.1}s`}}
+                    />
+                  ))}
+                </div>
+                
+                {visibleArticles < articles.length && (
+                  <div className="mt-8 flex justify-center">
+                    <Button 
+                      onClick={loadMore} 
+                      className="px-8 py-2 transition-all hover:scale-105"
+                    >
+                      Load More Articles
+                    </Button>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12">
+                <h2 className="text-2xl font-bold">No articles found</h2>
+                <p className="mt-2 text-gray-600">There are no articles in this category yet.</p>
+              </div>
+            )}
+          </div>
+        </section>
       </main>
       
       <Footer />

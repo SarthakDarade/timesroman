@@ -1,10 +1,12 @@
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ArticlePage from '../components/ArticlePage';
 import ArticleCard from '../components/ArticleCard';
+import ReadingProgressBar from '../components/ReadingProgressBar';
+import { BookmarkPlus, Share2, ThumbsUp, MessageCircle, BookOpen } from 'lucide-react';
+import { toast } from 'sonner';
 
 // Mock article data
 const mockArticles = {
@@ -41,6 +43,8 @@ const mockArticles = {
     author: 'Sarah Chen',
     imageUrl: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&q=80',
     readTime: '5 min',
+    authorImage: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80',
+    authorBio: 'Technology reporter specializing in AI and machine learning trends',
   },
   'pol-1': {
     id: 'pol-1',
@@ -107,6 +111,20 @@ const mockRelatedArticles = [
 const Article = () => {
   const { id } = useParams<{ id: string }>();
   const article = id && mockArticles[id as keyof typeof mockArticles];
+  
+  useEffect(() => {
+    // Scroll to top when article loads
+    window.scrollTo(0, 0);
+    
+    // Set page title
+    if (article) {
+      document.title = `${article.title} | Times Roman`;
+    }
+    
+    return () => {
+      document.title = 'Times Roman'; // Reset title on unmount
+    };
+  }, [article]);
 
   if (!article) {
     return (
@@ -125,18 +143,19 @@ const Article = () => {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <ReadingProgressBar />
       <Navbar />
       
       <main className="flex-1">
         <ArticlePage {...article} />
         
         {/* Related Articles Section */}
-        <section className="bg-gray-50 py-8">
+        <section className="bg-gray-50 py-12 animate-[fadeIn_1s_ease-in-out]">
           <div className="container mx-auto px-4">
             <h2 className="mb-6 font-serif text-2xl font-bold">Related Articles</h2>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
               {mockRelatedArticles.map((article) => (
-                <ArticleCard key={article.id} {...article} />
+                <ArticleCard key={article.id} {...article} className="transform transition-all hover:translate-y-[-8px]" />
               ))}
             </div>
           </div>

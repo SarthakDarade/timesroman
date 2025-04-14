@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Article from "./pages/Article";
 import Category from "./pages/Category";
 import NotFound from "./pages/NotFound";
+import ScrollToTop from "./components/ScrollToTop";
 import "./App.css";
 
 // Create a client
@@ -29,6 +30,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <div className="app-container">
+            <ScrollToTop />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/article/:id" element={<Article />} />

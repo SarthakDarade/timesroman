@@ -1,8 +1,9 @@
 
 import React, { useEffect, useState } from 'react';
-import { Clock, Share2, MessageSquare, Bookmark, ThumbsUp } from 'lucide-react';
+import { Clock, Share2, MessageSquare, Bookmark, ThumbsUp, BookOpen, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Progress } from '@/components/ui/progress';
+import { Avatar } from '@/components/ui/avatar';
 import { toast } from 'sonner';
 
 interface ArticlePageProps {
@@ -12,6 +13,8 @@ interface ArticlePageProps {
   category: string;
   date: string;
   author: string;
+  authorImage?: string;
+  authorBio?: string;
   imageUrl: string;
   readTime: string;
 }
@@ -23,10 +26,15 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
   category,
   date,
   author,
+  authorImage,
+  authorBio,
   imageUrl,
   readTime,
 }) => {
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [likeCount, setLikeCount] = useState(Math.floor(Math.random() * 100));
+  const [isLiked, setIsLiked] = useState(false);
   
   // Effect to handle scroll progress
   useEffect(() => {
@@ -60,12 +68,19 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
 
   // Function to bookmark article
   const handleBookmark = () => {
-    toast.success('Article bookmarked!');
+    setIsBookmarked(!isBookmarked);
+    toast.success(isBookmarked ? 'Bookmark removed!' : 'Article bookmarked!');
   };
 
   // Function to like article
   const handleLike = () => {
-    toast.success('You liked this article!');
+    if (!isLiked) {
+      setLikeCount(likeCount + 1);
+    } else {
+      setLikeCount(likeCount - 1);
+    }
+    setIsLiked(!isLiked);
+    toast.success(isLiked ? 'Like removed' : 'Thanks for your feedback!');
   };
 
   // Get category class
@@ -79,14 +94,15 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
       default: return 'bg-blue-600';
     }
   };
+  
+  // Calculate estimated read time range
+  const getReadTimeRange = () => {
+    const baseTime = parseInt(readTime.split(' ')[0]);
+    return `${baseTime}-${baseTime + 2} min`;
+  };
 
   return (
     <>
-      {/* Reading Progress Bar */}
-      <div className="progress-container">
-        <div className="progress-bar" style={{ width: `${scrollProgress}%` }}></div>
-      </div>
-
       <article className="container mx-auto px-4 py-8 animate-[fadeIn_0.5s_ease-in-out]">
         {/* Article Header */}
         <header className="mx-auto max-w-3xl">
@@ -109,8 +125,12 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
               <span>{date}</span>
             </div>
             <div className="flex items-center">
-              <Clock className="mr-1 h-4 w-4" />
-              <span>{readTime} read</span>
+              <BookOpen className="mr-1 h-4 w-4" />
+              <span>{getReadTimeRange()} read</span>
+            </div>
+            <div className="ml-4 flex items-center">
+              <Eye className="mr-1 h-4 w-4" />
+              <span>{Math.floor(Math.random() * 1000) + 500} views</span>
             </div>
           </div>
           
@@ -124,17 +144,18 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
             </button>
             <button 
               onClick={handleBookmark}
-              className="flex items-center rounded-full bg-gray-100 px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 transition-all duration-200 hover:scale-105"
+              className={`flex items-center rounded-full ${isBookmarked ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'} px-4 py-2 text-sm hover:bg-gray-200 transition-all duration-200 hover:scale-105`}
             >
-              <Bookmark className="mr-2 h-4 w-4" />
-              Save
+              <Bookmark className={`mr-2 h-4 w-4 ${isBookmarked ? 'fill-blue-500' : ''}`} />
+              {isBookmarked ? 'Saved' : 'Save'}
             </button>
             <button 
               onClick={handleLike}
-              className="flex items-center rounded-full bg-gray-100 px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 transition-all duration-200 hover:scale-105"
+              className={`flex items-center rounded-full ${isLiked ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'} px-4 py-2 text-sm hover:bg-gray-200 transition-all duration-200 hover:scale-105`}
             >
-              <ThumbsUp className="mr-2 h-4 w-4" />
-              Like
+              <ThumbsUp className={`mr-2 h-4 w-4 ${isLiked ? 'fill-red-500' : ''}`} />
+              <span className="mr-1">{isLiked ? 'Liked' : 'Like'}</span>
+              <span className="rounded-full bg-gray-200 px-2 py-px text-xs">{likeCount}</span>
             </button>
           </div>
         </header>
@@ -152,6 +173,21 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
             className="article-content prose prose-lg max-w-none reading-area animate-[fadeIn_1.5s_ease-in-out]" 
             dangerouslySetInnerHTML={{ __html: content }} 
           />
+          
+          {/* Author Bio */}
+          {authorBio && (
+            <div className="mt-12 flex items-start space-x-4 rounded-lg bg-gray-50 p-6 animate-[fadeIn_1.6s_ease-in-out]">
+              {authorImage && (
+                <Avatar className="h-12 w-12 border-2 border-white">
+                  <img src={authorImage} alt={author} className="rounded-full" />
+                </Avatar>
+              )}
+              <div>
+                <h3 className="text-lg font-semibold">{author}</h3>
+                <p className="text-sm text-gray-600">{authorBio}</p>
+              </div>
+            </div>
+          )}
           
           {/* Tags */}
           <div className="mt-8 flex flex-wrap gap-2 animate-[fadeIn_1.7s_ease-in-out]">

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Clock } from 'lucide-react';
+import { Clock, BookOpen, Eye } from 'lucide-react';
 
 interface ArticleCardProps {
   id: string;
@@ -35,13 +35,14 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
   };
 
   return (
-    <div className={`group overflow-hidden rounded-lg shadow hover:shadow-md transition-all article-card-animate ${className}`}>
+    <div className={`group overflow-hidden rounded-lg shadow-sm hover:shadow-xl transition-all duration-500 article-card-animate ${className}`}>
       <Link to={`/article/${id}`} className="block">
         <div className="aspect-[16/10] overflow-hidden">
           <img
             src={imageUrl}
             alt={title}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+            loading="lazy"
           />
         </div>
         <div className="p-4">
@@ -58,6 +59,17 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
             {title}
           </h3>
           <p className="line-clamp-2 text-sm text-gray-600">{excerpt}</p>
+          
+          <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
+            <div className="flex items-center">
+              <BookOpen className="mr-1 h-3 w-3" />
+              <span>5 min read</span>
+            </div>
+            <div className="flex items-center">
+              <Eye className="mr-1 h-3 w-3" />
+              <span>{Math.floor(Math.random() * 500) + 100} views</span>
+            </div>
+          </div>
         </div>
       </Link>
     </div>
