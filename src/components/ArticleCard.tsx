@@ -11,6 +11,7 @@ interface ArticleCardProps {
   date: string;
   imageUrl: string;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 const ArticleCard: React.FC<ArticleCardProps> = ({
@@ -21,6 +22,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
   date,
   imageUrl,
   className = '',
+  style,
 }) => {
   // Map category to color class
   const getCategoryClass = () => {
@@ -35,7 +37,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
   };
 
   return (
-    <div className={`group overflow-hidden rounded-lg shadow-sm hover:shadow-xl transition-all duration-500 article-card-animate ${className}`}>
+    <div className={`group overflow-hidden rounded-lg shadow-sm hover:shadow-xl transition-all duration-500 article-card-animate ${className}`} style={style}>
       <Link to={`/article/${id}`} className="block">
         <div className="aspect-[16/10] overflow-hidden">
           <img
