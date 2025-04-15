@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { Progress } from '@/components/ui/progress';
 import { Avatar } from '@/components/ui/avatar';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
 
 interface ArticlePageProps {
   id: string;
@@ -17,6 +18,8 @@ interface ArticlePageProps {
   authorBio?: string;
   imageUrl: string;
   readTime: string;
+  views?: number;
+  likes?: number;
 }
 
 const ArticlePage: React.FC<ArticlePageProps> = ({
@@ -30,11 +33,15 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
   authorBio,
   imageUrl,
   readTime,
+  views: initialViews = Math.floor(Math.random() * 1000) + 500,
+  likes: initialLikes = Math.floor(Math.random() * 100),
 }) => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const [likeCount, setLikeCount] = useState(Math.floor(Math.random() * 100));
+  const [likeCount, setLikeCount] = useState(initialLikes);
   const [isLiked, setIsLiked] = useState(false);
+  const [viewCount, setViewCount] = useState(initialViews);
+  const { user } = useAuth();
   
   // Effect to handle scroll progress
   useEffect(() => {
@@ -48,6 +55,28 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Effect to increment view count only once per session
+  useEffect(() => {
+    const viewedArticles = JSON.parse(localStorage.getItem('viewedArticles') || '{}');
+    
+    if (!viewedArticles[id]) {
+      // Increment view counter
+      setViewCount(prev => prev + 1);
+      
+      // Mark this article as viewed
+      viewedArticles[id] = true;
+      localStorage.setItem('viewedArticles', JSON.stringify(viewedArticles));
+    }
+    
+    // Check if article is bookmarked
+    const bookmarkedArticles = JSON.parse(localStorage.getItem('bookmarkedArticles') || '{}');
+    setIsBookmarked(!!bookmarkedArticles[id]);
+    
+    // Check if article is liked
+    const likedArticles = JSON.parse(localStorage.getItem('likedArticles') || '{}');
+    setIsLiked(!!likedArticles[id]);
+  }, [id]);
 
   // Function to handle share
   const handleShare = () => {
@@ -68,17 +97,42 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
 
   // Function to bookmark article
   const handleBookmark = () => {
+    if (!user) {
+      toast.error('Please sign in to bookmark articles');
+      return;
+    }
+    
+    const bookmarkedArticles = JSON.parse(localStorage.getItem('bookmarkedArticles') || '{}');
+    
+    if (isBookmarked) {
+      delete bookmarkedArticles[id];
+    } else {
+      bookmarkedArticles[id] = true;
+    }
+    
+    localStorage.setItem('bookmarkedArticles', JSON.stringify(bookmarkedArticles));
     setIsBookmarked(!isBookmarked);
     toast.success(isBookmarked ? 'Bookmark removed!' : 'Article bookmarked!');
   };
 
   // Function to like article
   const handleLike = () => {
-    if (!isLiked) {
-      setLikeCount(likeCount + 1);
-    } else {
-      setLikeCount(likeCount - 1);
+    if (!user) {
+      toast.error('Please sign in to like articles');
+      return;
     }
+    
+    const likedArticles = JSON.parse(localStorage.getItem('likedArticles') || '{}');
+    
+    if (isLiked) {
+      delete likedArticles[id];
+      setLikeCount(likeCount - 1);
+    } else {
+      likedArticles[id] = true;
+      setLikeCount(likeCount + 1);
+    }
+    
+    localStorage.setItem('likedArticles', JSON.stringify(likedArticles));
     setIsLiked(!isLiked);
     toast.success(isLiked ? 'Like removed' : 'Thanks for your feedback!');
   };
@@ -130,7 +184,7 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
             </div>
             <div className="ml-4 flex items-center">
               <Eye className="mr-1 h-4 w-4" />
-              <span>{Math.floor(Math.random() * 1000) + 500} views</span>
+              <span>{viewCount} views</span>
             </div>
           </div>
           

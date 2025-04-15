@@ -12,6 +12,7 @@ type AuthContextType = {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  refreshSession: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,6 +22,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  const refreshSession = async () => {
+    try {
+      const { data, error } = await supabase.auth.refreshSession();
+      if (error) throw error;
+      setSession(data.session);
+      setUser(data.session?.user ?? null);
+    } catch (error: any) {
+      console.error('Error refreshing session:', error.message);
+    }
+  };
 
   useEffect(() => {
     // Set up auth state listener first
@@ -70,6 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (error) throw error;
       toast.success('Registration successful! Check your email for confirmation.');
+      navigate('/auth'); // Redirect to auth page after signup
     } catch (error: any) {
       toast.error(error.message || 'Error signing up');
       throw error;
@@ -91,7 +104,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      session, 
+      loading, 
+      signIn, 
+      signUp, 
+      signOut,
+      refreshSession 
+    }}>
       {children}
     </AuthContext.Provider>
   );

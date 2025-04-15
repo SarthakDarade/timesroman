@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Search } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import UserMenu from './UserMenu';
+import SearchBar from './SearchBar';
 
 const categories = [
   { name: "Politics", path: "/category/politics" },
@@ -44,9 +45,7 @@ const Navbar: React.FC = () => {
 
           {/* User Menu and Search */}
           <div className="flex items-center space-x-2">
-            <button className="rounded-full p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-              <Search className="h-5 w-5" />
-            </button>
+            <SearchBar />
             
             {/* User Menu */}
             <UserMenu />

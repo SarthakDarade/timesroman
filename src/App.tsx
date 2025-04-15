@@ -11,6 +11,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Index from "./pages/Index";
 import Article from "./pages/Article";
 import Category from "./pages/Category";
+import Search from "./pages/Search";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
@@ -35,6 +36,7 @@ const AppContent = () => (
         <Route path="/" element={<Index />} />
         <Route path="/article/:id" element={<Article />} />
         <Route path="/category/:categoryId" element={<Category />} />
+        <Route path="/search" element={<Search />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/profile" element={
           <ProtectedRoute>
