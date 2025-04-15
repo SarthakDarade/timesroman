@@ -13,6 +13,7 @@ type AuthContextType = {
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   refreshSession: () => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -44,6 +45,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         if (event === 'SIGNED_IN') {
           toast.success('Signed in successfully');
+          // Redirect after successful sign in
+          navigate('/');
         } else if (event === 'SIGNED_OUT') {
           toast.info('Signed out');
         }
@@ -58,7 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [navigate]);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -66,7 +69,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       
       if (error) throw error;
-      navigate('/');
     } catch (error: any) {
       toast.error(error.message || 'Error signing in');
       throw error;
@@ -82,9 +84,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (error) throw error;
       toast.success('Registration successful! Check your email for confirmation.');
-      navigate('/auth'); // Redirect to auth page after signup
     } catch (error: any) {
       toast.error(error.message || 'Error signing up');
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signInWithGoogle = async () => {
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin + '/auth/callback'
+        }
+      });
+      
+      if (error) throw error;
+    } catch (error: any) {
+      toast.error(error.message || 'Error signing in with Google');
       throw error;
     } finally {
       setLoading(false);
@@ -111,7 +131,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       signIn, 
       signUp, 
       signOut,
-      refreshSession 
+      refreshSession,
+      signInWithGoogle 
     }}>
       {children}
     </AuthContext.Provider>

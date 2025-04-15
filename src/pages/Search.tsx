@@ -21,11 +21,17 @@ const Search = () => {
     if (query) {
       const allArticles = [...Object.values(mockArticles), ...mockRelatedArticles];
       
-      const filtered = allArticles.filter(article => 
-        article.title.toLowerCase().includes(query.toLowerCase()) || 
-        (article.content && article.content.toLowerCase().includes(query.toLowerCase())) ||
-        (article.excerpt && article.excerpt.toLowerCase().includes(query.toLowerCase()))
-      );
+      const filtered = allArticles.filter(article => {
+        const titleMatch = article.title.toLowerCase().includes(query.toLowerCase());
+        const contentMatch = 'content' in article && article.content 
+          ? article.content.toLowerCase().includes(query.toLowerCase()) 
+          : false;
+        const excerptMatch = 'excerpt' in article && article.excerpt 
+          ? article.excerpt.toLowerCase().includes(query.toLowerCase()) 
+          : false;
+        
+        return titleMatch || contentMatch || excerptMatch;
+      });
       
       setResults(filtered);
     } else {
@@ -56,7 +62,7 @@ const Search = () => {
                 key={article.id}
                 id={article.id}
                 title={article.title}
-                excerpt={article.excerpt || article.content?.substring(0, 120)}
+                excerpt={'excerpt' in article ? article.excerpt : article.content?.substring(0, 120)}
                 category={article.category}
                 date={article.date}
                 imageUrl={article.imageUrl}

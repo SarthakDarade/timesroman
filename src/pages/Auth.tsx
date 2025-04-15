@@ -5,9 +5,11 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { FcGoogle } from 'react-icons/fc';
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 import {
   Form,
   FormControl,
@@ -38,7 +40,7 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
-  const { signIn, signUp, loading } = useAuth();
+  const { signIn, signUp, loading, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -80,6 +82,14 @@ const Auth = () => {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      console.error("Google sign in error:", error);
+    }
+  };
+
   const toggleForm = () => {
     setIsLogin(!isLogin);
   };
@@ -100,6 +110,24 @@ const Auth = () => {
                 : "Join Times Roman to access exclusive content"
               }
             </p>
+          </div>
+          
+          {/* Google Sign In Button */}
+          <Button 
+            variant="outline" 
+            className="w-full mb-4 flex items-center justify-center gap-2"
+            onClick={handleGoogleSignIn}
+            disabled={loading}
+          >
+            <FcGoogle className="h-5 w-5" />
+            {isLogin ? "Sign In with Google" : "Sign Up with Google"}
+          </Button>
+          
+          <div className="relative my-6">
+            <Separator />
+            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-2 text-xs text-gray-500">
+              OR
+            </span>
           </div>
           
           {isLogin ? (

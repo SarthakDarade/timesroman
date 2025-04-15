@@ -28,6 +28,20 @@ const queryClient = new QueryClient({
   },
 });
 
+// Auth callback component to handle OAuth redirects
+const AuthCallback = () => {
+  React.useEffect(() => {
+    // The session is automatically handled by Supabase
+    window.location.href = '/';
+  }, []);
+
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <p>Completing authentication, please wait...</p>
+    </div>
+  );
+};
+
 const AppContent = () => (
   <AuthProvider>
     <div className="app-container">
@@ -38,6 +52,7 @@ const AppContent = () => (
         <Route path="/category/:categoryId" element={<Category />} />
         <Route path="/search" element={<Search />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/profile" element={
           <ProtectedRoute>
             <Profile />
