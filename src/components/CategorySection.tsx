@@ -18,12 +18,14 @@ interface CategorySectionProps {
   title: string;
   categoryPath: string;
   articles: Article[];
+  loading?: boolean;
 }
 
 const CategorySection: React.FC<CategorySectionProps> = ({
   title,
   categoryPath,
   articles,
+  loading = false,
 }) => {
   // Get gradient background based on title
   const getGradientClass = () => {
@@ -50,15 +52,37 @@ const CategorySection: React.FC<CategorySectionProps> = ({
         </div>
         
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {articles.map((article, index) => (
-            <div 
-              key={article.id} 
-              className="animate-[fadeIn_0.5s_ease-in-out]" 
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              <ArticleCard {...article} />
-            </div>
-          ))}
+          {loading ? (
+            // Loading skeletons
+            [...Array(3)].map((_, index) => (
+              <div 
+                key={`loading-${index}`} 
+                className="animate-pulse rounded-lg overflow-hidden shadow-sm"
+              >
+                <div className="aspect-[16/10] bg-gray-200"></div>
+                <div className="p-4">
+                  <div className="h-4 bg-gray-200 rounded mb-2 w-1/4"></div>
+                  <div className="h-6 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded mb-4 w-3/4"></div>
+                  <div className="flex justify-between">
+                    <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            // Actual articles
+            articles.map((article, index) => (
+              <div 
+                key={article.id} 
+                className="animate-[fadeIn_0.5s_ease-in-out]" 
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <ArticleCard {...article} />
+              </div>
+            ))
+          )}
         </div>
       </div>
     </section>

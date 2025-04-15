@@ -4,39 +4,68 @@ import { useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ArticleCard from '../components/ArticleCard';
+import { supabase } from '@/integrations/supabase/client';
 
-// Import mock articles from Article.tsx
-import { mockArticles, mockRelatedArticles } from '../utils/mockData';
+interface Article {
+  id: string;
+  title: string;
+  excerpt?: string;
+  content?: string;
+  category: string;
+  date: string;
+  imageUrl: string;
+}
 
 const Search = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     // Set page title
     document.title = `Search results for "${query}" | Times Roman`;
 
     // Search logic
-    if (query) {
-      const allArticles = [...Object.values(mockArticles), ...mockRelatedArticles];
+    const fetchSearchResults = async () => {
+      if (!query) {
+        setResults([]);
+        return;
+      }
       
-      const filtered = allArticles.filter(article => {
-        const titleMatch = article.title.toLowerCase().includes(query.toLowerCase());
-        const contentMatch = 'content' in article && article.content 
-          ? article.content.toLowerCase().includes(query.toLowerCase()) 
-          : false;
-        const excerptMatch = 'excerpt' in article && article.excerpt 
-          ? article.excerpt.toLowerCase().includes(query.toLowerCase()) 
-          : false;
+      setLoading(true);
+      
+      try {
+        // Search in Supabase using ilike for case-insensitive search
+        const { data, error } = await supabase
+          .from('articles')
+          .select('*')
+          .or(`title.ilike.%${query}%,content.ilike.%${query}%,excerpt.ilike.%${query}%`);
         
-        return titleMatch || contentMatch || excerptMatch;
-      });
-      
-      setResults(filtered);
-    } else {
-      setResults([]);
-    }
+        if (error) {
+          console.error('Error searching articles:', error);
+          return;
+        }
+        
+        // Map to our app's article format
+        const articles = data.map(article => ({
+          id: article.id,
+          title: article.title,
+          excerpt: article.excerpt || article.content?.substring(0, 120) || '',
+          category: article.category,
+          date: article.date,
+          imageUrl: article.image_url
+        }));
+        
+        setResults(articles);
+      } catch (err) {
+        console.error('Error fetching search results:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSearchResults();
   }, [query]);
 
   return (
@@ -48,7 +77,13 @@ const Search = () => {
           {query ? `Search results for "${query}"` : 'Search'}
         </h1>
         
-        {query && results.length === 0 && (
+        {loading && (
+          <div className="flex justify-center py-8">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+          </div>
+        )}
+        
+        {query && !loading && results.length === 0 && (
           <div className="rounded-lg bg-gray-50 p-6 text-center">
             <p className="text-gray-600">No results found for "{query}"</p>
             <p className="mt-2 text-sm text-gray-500">Try different keywords or browse our categories</p>
@@ -62,7 +97,7 @@ const Search = () => {
                 key={article.id}
                 id={article.id}
                 title={article.title}
-                excerpt={'excerpt' in article ? article.excerpt : article.content?.substring(0, 120)}
+                excerpt={article.excerpt || ''}
                 category={article.category}
                 date={article.date}
                 imageUrl={article.imageUrl}

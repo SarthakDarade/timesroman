@@ -9,6 +9,60 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      articles: {
+        Row: {
+          author: string
+          author_bio: string | null
+          author_image: string | null
+          category: string
+          content: string | null
+          created_at: string | null
+          date: string
+          excerpt: string | null
+          id: string
+          image_url: string
+          likes: number | null
+          read_time: string | null
+          title: string
+          updated_at: string | null
+          views: number | null
+        }
+        Insert: {
+          author: string
+          author_bio?: string | null
+          author_image?: string | null
+          category: string
+          content?: string | null
+          created_at?: string | null
+          date: string
+          excerpt?: string | null
+          id: string
+          image_url: string
+          likes?: number | null
+          read_time?: string | null
+          title: string
+          updated_at?: string | null
+          views?: number | null
+        }
+        Update: {
+          author?: string
+          author_bio?: string | null
+          author_image?: string | null
+          category?: string
+          content?: string | null
+          created_at?: string | null
+          date?: string
+          excerpt?: string | null
+          id?: string
+          image_url?: string
+          likes?: number | null
+          read_time?: string | null
+          title?: string
+          updated_at?: string | null
+          views?: number | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

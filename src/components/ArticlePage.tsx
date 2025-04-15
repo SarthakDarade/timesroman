@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { 
   Clock, 
@@ -22,6 +21,7 @@ import {
   CardHeader 
 } from '@/components/ui/card';
 import AuthorAvatar from './AuthorAvatar';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ArticlePageProps {
   id: string;
@@ -49,14 +49,14 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
   authorBio,
   imageUrl,
   readTime,
-  views: initialViews = Math.floor(Math.random() * 1000) + 500,
-  likes: initialLikes = Math.floor(Math.random() * 100),
+  views = 0,
+  likes = 0,
 }) => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const [likeCount, setLikeCount] = useState(initialLikes);
+  const [likeCount, setLikeCount] = useState(likes);
   const [isLiked, setIsLiked] = useState(false);
-  const [viewCount, setViewCount] = useState(initialViews);
+  const [viewCount, setViewCount] = useState(views);
   const { user } = useAuth();
   
   // Effect to handle scroll progress
@@ -72,19 +72,8 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Effect to increment view count only once per session
+  // Effect to check if article is bookmarked or liked
   useEffect(() => {
-    const viewedArticles = JSON.parse(localStorage.getItem('viewedArticles') || '{}');
-    
-    if (!viewedArticles[id]) {
-      // Increment view counter
-      setViewCount(prev => prev + 1);
-      
-      // Mark this article as viewed
-      viewedArticles[id] = true;
-      localStorage.setItem('viewedArticles', JSON.stringify(viewedArticles));
-    }
-    
     // Check if article is bookmarked
     const bookmarkedArticles = JSON.parse(localStorage.getItem('bookmarkedArticles') || '{}');
     setIsBookmarked(!!bookmarkedArticles[id]);
@@ -92,7 +81,11 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
     // Check if article is liked
     const likedArticles = JSON.parse(localStorage.getItem('likedArticles') || '{}');
     setIsLiked(!!likedArticles[id]);
-  }, [id]);
+    
+    // Set view count from props
+    setViewCount(views);
+    setLikeCount(likes);
+  }, [id, views, likes]);
 
   // Function to handle share
   const handleShare = () => {
@@ -132,14 +125,17 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
   };
 
   // Function to like article
-  const handleLike = () => {
+  const handleLike = async () => {
     if (!user) {
       toast.error('Please sign in to like articles');
       return;
     }
     
     const likedArticles = JSON.parse(localStorage.getItem('likedArticles') || '{}');
+    const newIsLiked = !isLiked;
+    const newLikeCount = isLiked ? likeCount - 1 : likeCount + 1;
     
+    // Update locally first for immediate feedback
     if (isLiked) {
       delete likedArticles[id];
       setLikeCount(likeCount - 1);
@@ -149,8 +145,23 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
     }
     
     localStorage.setItem('likedArticles', JSON.stringify(likedArticles));
-    setIsLiked(!isLiked);
-    toast.success(isLiked ? 'Like removed' : 'Thanks for your feedback!');
+    setIsLiked(newIsLiked);
+    
+    // Update in Supabase
+    try {
+      await supabase
+        .from('articles')
+        .update({ likes: newLikeCount })
+        .eq('id', id);
+      
+      toast.success(isLiked ? 'Like removed' : 'Thanks for your feedback!');
+    } catch (error) {
+      // If update fails, revert local state
+      console.error('Error updating like count:', error);
+      setLikeCount(likeCount);
+      setIsLiked(isLiked);
+      toast.error('Failed to update like status');
+    }
   };
 
   // Get category class

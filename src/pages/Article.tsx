@@ -1,30 +1,111 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ArticlePage from '../components/ArticlePage';
 import ArticleCard from '../components/ArticleCard';
 import ReadingProgressBar from '../components/ReadingProgressBar';
-import { mockArticles, mockRelatedArticles } from '../utils/mockData';
 import AuthorAvatar from '../components/AuthorAvatar';
+import { supabase } from '@/integrations/supabase/client';
+
+interface Article {
+  id: string;
+  title: string;
+  content?: string;
+  excerpt?: string;
+  category: string;
+  date: string;
+  author: string;
+  authorImage?: string;
+  authorBio?: string;
+  imageUrl: string;
+  readTime?: string;
+  views?: number;
+  likes?: number;
+}
 
 const Article = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  
-  // Find article in both main and related articles
-  const allArticles = { ...mockArticles };
-  mockRelatedArticles.forEach(article => {
-    allArticles[article.id] = article;
-  });
-  
-  const article = id ? allArticles[id] : null;
+  const [article, setArticle] = useState<Article | null>(null);
+  const [relatedArticles, setRelatedArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
+    // Fetch the article from Supabase
+    const fetchArticle = async () => {
+      if (!id) return;
+      
+      setLoading(true);
+      
+      try {
+        // Fetch the main article
+        const { data: articleData, error: articleError } = await supabase
+          .from('articles')
+          .select('*')
+          .eq('id', id)
+          .single();
+        
+        if (articleError) {
+          console.error('Error fetching article:', articleError);
+          setLoading(false);
+          return;
+        }
+        
+        // Format the article data
+        const formattedArticle = {
+          id: articleData.id,
+          title: articleData.title,
+          content: articleData.content || '',
+          category: articleData.category,
+          date: articleData.date,
+          author: articleData.author,
+          authorImage: articleData.author_image,
+          authorBio: articleData.author_bio,
+          imageUrl: articleData.image_url,
+          readTime: articleData.read_time || '3 min',
+          views: articleData.views || 0,
+          likes: articleData.likes || 0,
+        };
+        
+        setArticle(formattedArticle);
+        
+        // Fetch related articles in the same category
+        const { data: relatedData, error: relatedError } = await supabase
+          .from('articles')
+          .select('*')
+          .eq('category', articleData.category)
+          .neq('id', id)
+          .limit(3);
+        
+        if (!relatedError && relatedData) {
+          const formattedRelated = relatedData.map(item => ({
+            id: item.id,
+            title: item.title,
+            excerpt: item.excerpt || '',
+            category: item.category,
+            date: item.date,
+            author: item.author,
+            imageUrl: item.image_url,
+            readTime: item.read_time
+          }));
+          
+          setRelatedArticles(formattedRelated);
+        }
+      } catch (error) {
+        console.error('Error loading article:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     // Scroll to top when article loads
     window.scrollTo(0, 0);
-    
+    fetchArticle();
+  }, [id]);
+
+  useEffect(() => {
     // Set page title
     if (article) {
       document.title = `${article.title} | Times Roman`;
@@ -34,6 +115,54 @@ const Article = () => {
       document.title = 'Times Roman'; // Reset title on unmount
     };
   }, [article]);
+
+  // Update view count when the article is viewed
+  useEffect(() => {
+    const updateViewCount = async () => {
+      if (!article || !id) return;
+      
+      // Check if this article has been viewed in this session
+      const viewedArticles = JSON.parse(localStorage.getItem('viewedArticles') || '{}');
+      
+      if (!viewedArticles[id]) {
+        // Mark as viewed
+        viewedArticles[id] = true;
+        localStorage.setItem('viewedArticles', JSON.stringify(viewedArticles));
+        
+        // Update view count in Supabase
+        const newViewCount = article.views ? article.views + 1 : 1;
+        
+        try {
+          await supabase
+            .from('articles')
+            .update({ views: newViewCount })
+            .eq('id', id);
+            
+          // Update local state
+          setArticle(prev => prev ? {...prev, views: newViewCount} : null);
+        } catch (error) {
+          console.error('Error updating view count:', error);
+        }
+      }
+    };
+    
+    updateViewCount();
+  }, [article, id]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <Navbar />
+        <main className="container mx-auto flex-1 px-4 py-8">
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+            <p className="mt-4 text-gray-600">Loading article...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!article) {
     return (
@@ -60,16 +189,16 @@ const Article = () => {
   const standardizedArticle = {
     id: article.id,
     title: article.title,
-    content: 'content' in article ? article.content : ('excerpt' in article ? `<p>${article.excerpt}</p>` : ''),
+    content: article.content || '',
     category: article.category,
     date: article.date,
-    author: 'author' in article ? article.author : 'Editorial Team',
-    authorImage: 'authorImage' in article ? article.authorImage : 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80',
-    authorBio: 'authorBio' in article ? article.authorBio : 'Times Roman Editorial Team',
+    author: article.author,
+    authorImage: article.authorImage || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80',
+    authorBio: article.authorBio || 'Times Roman Editorial Team',
     imageUrl: article.imageUrl,
-    readTime: 'readTime' in article ? article.readTime : '3 min',
-    views: 'views' in article ? article.views : Math.floor(Math.random() * 1000) + 500,
-    likes: 'likes' in article ? article.likes : Math.floor(Math.random() * 100),
+    readTime: article.readTime || '3 min',
+    views: article.views || 0,
+    likes: article.likes || 0,
   };
 
   return (
@@ -84,14 +213,19 @@ const Article = () => {
         <section className="bg-gray-50 py-12 animate-[fadeIn_1s_ease-in-out]">
           <div className="container mx-auto px-4">
             <h2 className="mb-6 font-serif text-2xl font-bold">Related Articles</h2>
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-              {mockRelatedArticles
-                .filter(relatedArticle => relatedArticle.id !== id)
-                .slice(0, 3)
-                .map((article) => (
-                  <ArticleCard key={article.id} {...article} className="transform transition-all hover:translate-y-[-8px]" />
+            {relatedArticles.length > 0 ? (
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                {relatedArticles.map((article) => (
+                  <ArticleCard 
+                    key={article.id} 
+                    {...article} 
+                    className="transform transition-all hover:translate-y-[-8px]" 
+                  />
                 ))}
-            </div>
+              </div>
+            ) : (
+              <p className="text-gray-500">No related articles found.</p>
+            )}
           </div>
         </section>
       </main>

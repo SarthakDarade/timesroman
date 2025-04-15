@@ -6,10 +6,12 @@ import { Clock, BookOpen, Eye } from 'lucide-react';
 interface ArticleCardProps {
   id: string;
   title: string;
-  excerpt: string;
+  excerpt?: string;
   category: string;
   date: string;
   imageUrl: string;
+  readTime?: string;
+  views?: number;
   className?: string;
   style?: React.CSSProperties;
 }
@@ -17,10 +19,12 @@ interface ArticleCardProps {
 const ArticleCard: React.FC<ArticleCardProps> = ({
   id,
   title,
-  excerpt,
+  excerpt = '',
   category,
   date,
   imageUrl,
+  readTime = '3 min',
+  views,
   className = '',
   style,
 }) => {
@@ -32,9 +36,13 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
       case 'health': return 'category-health';
       case 'entertainment': return 'category-entertainment';
       case 'sports': return 'category-sports';
+      case 'politics': return 'bg-red-600';
       default: return 'bg-blue-600';
     }
   };
+
+  // Random view count for display if not provided
+  const displayViews = views !== undefined ? views : Math.floor(Math.random() * 500) + 100;
 
   return (
     <div className={`group overflow-hidden rounded-lg shadow-sm hover:shadow-xl transition-all duration-500 article-card-animate ${className}`} style={style}>
@@ -65,11 +73,11 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
           <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
             <div className="flex items-center">
               <BookOpen className="mr-1 h-3 w-3" />
-              <span>5 min read</span>
+              <span>{readTime} read</span>
             </div>
             <div className="flex items-center">
               <Eye className="mr-1 h-3 w-3" />
-              <span>{Math.floor(Math.random() * 500) + 100} views</span>
+              <span>{displayViews} views</span>
             </div>
           </div>
         </div>
