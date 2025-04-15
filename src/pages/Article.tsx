@@ -7,6 +7,7 @@ import ArticlePage from '../components/ArticlePage';
 import ArticleCard from '../components/ArticleCard';
 import ReadingProgressBar from '../components/ReadingProgressBar';
 import { mockArticles, mockRelatedArticles } from '../utils/mockData';
+import AuthorAvatar from '../components/AuthorAvatar';
 
 const Article = () => {
   const { id } = useParams<{ id: string }>();
@@ -42,6 +43,12 @@ const Article = () => {
           <div className="flex flex-col items-center justify-center py-12">
             <h1 className="text-2xl font-bold">Article not found</h1>
             <p className="mt-2 text-gray-600">The article you're looking for doesn't exist or has been removed.</p>
+            <button 
+              onClick={() => navigate('/')}
+              className="mt-4 rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+            >
+              Back to Homepage
+            </button>
           </div>
         </main>
         <Footer />
@@ -57,8 +64,8 @@ const Article = () => {
     category: article.category,
     date: article.date,
     author: 'author' in article ? article.author : 'Editorial Team',
-    authorImage: 'authorImage' in article ? article.authorImage : undefined,
-    authorBio: 'authorBio' in article ? article.authorBio : undefined,
+    authorImage: 'authorImage' in article ? article.authorImage : 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80',
+    authorBio: 'authorBio' in article ? article.authorBio : 'Times Roman Editorial Team',
     imageUrl: article.imageUrl,
     readTime: 'readTime' in article ? article.readTime : '3 min',
     views: 'views' in article ? article.views : Math.floor(Math.random() * 1000) + 500,

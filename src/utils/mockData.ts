@@ -67,6 +67,8 @@ export const mockArticles = {
     category: 'Politics',
     date: 'April 14, 2025',
     author: 'James Wilson',
+    authorImage: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80',
+    authorBio: 'Political correspondent with expertise in climate policy',
     imageUrl: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80',
     readTime: '6 min',
     views: 950,
@@ -97,6 +99,8 @@ export const mockArticles = {
     category: 'Business',
     date: 'April 13, 2025',
     author: 'Michael Chang',
+    authorImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80',
+    authorBio: 'Business analyst focusing on tech regulation and policy',
     imageUrl: 'https://images.unsplash.com/photo-1444653614773-995cb1ef9efa?auto=format&fit=crop&q=80',
     readTime: '4 min',
     views: 825,
@@ -104,15 +108,37 @@ export const mockArticles = {
   },
 };
 
-// Mock related articles
+// Mock related articles - ensure all have the necessary fields for our standardized format
 export const mockRelatedArticles = [
   {
     id: 'related-1',
     title: 'Media Ethics in the Age of AI-Generated Content',
     excerpt: 'As artificial intelligence creates increasingly convincing content, newsrooms grapple with new ethical challenges.',
+    content: `<p>As artificial intelligence creates increasingly convincing content, newsrooms are grappling with new ethical challenges that were unimaginable just a few years ago.</p>
+    
+    <p>The rise of generative AI models capable of producing news articles, opinion pieces, and even investigative reports that are virtually indistinguishable from human-written content has raised profound questions about authorship, transparency, and journalistic integrity.</p>
+    
+    <h2>The Transparency Challenge</h2>
+    <p>Media organizations are wrestling with how to disclose their use of AI tools in the content creation process. Some have adopted explicit labeling policies, while others argue that AI is simply another tool in the journalistic toolkit that doesn't require special disclosure.</p>
+    
+    <p>"Readers deserve to know when content has been created or substantially edited by AI systems," argues Dr. Eliza Montgomery, chair of digital ethics at Columbia Journalism School. "The bond of trust between journalists and their audience depends on this transparency."</p>
+    
+    <h2>Quality Control Concerns</h2>
+    <p>The accuracy and reliability of AI-generated content presents another significant challenge. Even the most advanced language models can generate plausible-sounding but entirely fictional information—a phenomenon known as "hallucination."</p>
+    
+    <p>Newsrooms are developing rigorous fact-checking protocols for AI-assisted content, with many implementing multi-layered review processes to catch potential inaccuracies before publication.</p>
+    
+    <h2>The Future of Journalistic Labor</h2>
+    <p>Perhaps most contentiously, AI's growing capabilities raise questions about the future of journalism as a profession. While some outlets are using AI to automate routine reporting tasks, others worry about the potential displacement of entry-level journalists who traditionally cut their teeth on such assignments.</p>
+    
+    <p>As the technology continues to evolve, both individual journalists and media organizations must navigate these complex ethical waters while maintaining their commitment to accuracy, fairness, and serving the public interest.</p>`,
     category: 'Technology',
     date: 'April 12, 2025',
+    author: 'David Nguyen',
+    authorImage: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80',
+    authorBio: 'Media ethics researcher and digital journalism lecturer',
     imageUrl: 'https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?auto=format&fit=crop&q=80',
+    readTime: '4 min',
     views: 780,
     likes: 37,
   },
@@ -120,9 +146,33 @@ export const mockRelatedArticles = [
     id: 'related-2',
     title: 'Public Trust in Algorithmic News Selection Declining',
     excerpt: 'Recent study shows growing skepticism toward news recommendation systems despite improvements in personalization.',
+    content: `<p>A comprehensive new study from the Digital News Trust Initiative reveals growing public skepticism toward algorithmically selected news content, despite significant technological advances in personalization systems.</p>
+    
+    <p>The research, which surveyed over 8,000 news consumers across twelve countries, found that 64% of respondents expressed concern about potential bias in news recommendation algorithms—a marked increase from 52% just two years ago.</p>
+    
+    <h2>Transparency Deficit</h2>
+    <p>One of the key factors driving this decline in trust appears to be a perceived lack of transparency about how news selection algorithms work. Fully 71% of respondents indicated they have little to no understanding of how online platforms determine which news stories appear in their feeds.</p>
+    
+    <p>"People are increasingly aware that algorithms are curating their information environment, but they feel powerless to influence or even understand that process," explains Dr. Rebecca Santos, the study's lead author.</p>
+    
+    <h2>Filter Bubble Concerns</h2>
+    <p>The research also highlights widespread concern about so-called "filter bubbles," with 58% of respondents believing that algorithmic news selection limits their exposure to diverse viewpoints. This perception persists despite evidence that many recommendation systems now include deliberate diversity measures.</p>
+    
+    <p>Notably, respondents who reported regularly using multiple news sources expressed greater confidence in their ability to overcome potential algorithmic limitations.</p>
+    
+    <h2>Industry Response</h2>
+    <p>The findings present a significant challenge for both technology platforms and news organizations that increasingly rely on algorithmic distribution channels to reach audiences.</p>
+    
+    <p>Some industry leaders are already responding by implementing more user controls and offering greater insight into recommendation systems. The most promising approaches appear to combine algorithmic efficiency with meaningful human oversight and user agency.</p>
+    
+    <p>As one industry executive noted, "The future of news discovery likely isn't purely algorithmic or purely human-curated—it's a thoughtful synthesis of both approaches."</p>`,
     category: 'Technology',
     date: 'April 10, 2025',
+    author: 'Lisa Moreno',
+    authorImage: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80',
+    authorBio: 'Technology analyst focusing on the intersection of AI and media',
     imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80',
+    readTime: '5 min',
     views: 630,
     likes: 29,
   },
@@ -130,9 +180,33 @@ export const mockRelatedArticles = [
     id: 'related-3',
     title: 'Small Newsrooms Embrace AI Tools to Compete with Media Giants',
     excerpt: 'Independent publishers find success using machine learning to enhance reporting capabilities without expanding staff.',
+    content: `<p>In an increasingly competitive media landscape, small and independent newsrooms are turning to artificial intelligence as a crucial equalizer, allowing them to produce sophisticated journalism with limited resources.</p>
+    
+    <p>From automated data analysis to smart content management systems, these tools are helping smaller outlets punch above their weight class without significant staff expansion.</p>
+    
+    <h2>Leveling the Playing Field</h2>
+    <p>For publications with just a handful of journalists, AI tools are proving transformative. The Mountain Chronicle, a digital newspaper serving communities across the Rocky Mountains with a staff of just four full-time reporters, has implemented machine learning systems that automatically monitor thousands of public records and flag potential stories.</p>
+    
+    <p>"Before implementing these tools, we were missing important stories simply because we couldn't manually review all the available public data," explains Janet Rivera, the Chronicle's editor-in-chief. "Now our small team can spot patterns and leads that previously would have required a much larger newsroom."</p>
+    
+    <h2>Cost-Effective Solutions</h2>
+    <p>The economics of these technologies have shifted dramatically in recent years, making them accessible even to newsrooms with modest technology budgets. Open-source tools and cloud-based services have significantly reduced the entry barriers.</p>
+    
+    <p>The Midwest Investigative Collaborative, a nonprofit serving five states, estimates that its AI-assisted research tools deliver the equivalent output of three additional investigative reporters—capacity it could never afford to add through traditional hiring.</p>
+    
+    <h2>Maintaining Editorial Control</h2>
+    <p>While embracing technological assistance, these newsrooms emphasize that human journalists remain firmly in control of the editorial process. AI tools augment rather than replace the core journalistic functions of verification, contextualization, and narrative crafting.</p>
+    
+    <p>"These systems are incredibly powerful at finding needles in haystacks, but they can't replace journalistic judgment about what makes a compelling story or how to report it ethically," notes media analyst Cameron West.</p>
+    
+    <p>As these technologies continue to evolve and become more accessible, they may help ensure the survival of vital independent voices in an industry increasingly dominated by large media conglomerates.</p>`,
     category: 'Business',
     date: 'April 9, 2025',
+    author: 'Robert Kim',
+    authorImage: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80',
+    authorBio: 'Media business reporter covering technology adoption in newsrooms',
     imageUrl: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80',
+    readTime: '6 min',
     views: 540,
     likes: 25,
   },
