@@ -25,7 +25,7 @@ import Footer from '../components/Footer';
 const googleOAuthConfig = {
   clientId: "674049796284-u4jjioha7pgaubavllj8bj2u81vq0kuf.apps.googleusercontent.com",
   clientSecret: "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",
-  redirectUri: "https://timesroman.in/",
+  redirectUri: "https://jdencffimqusolxqbnjw.supabase.co/auth/v1/callback flowName=GeneralOAuthFlow",
   authUri: "https://accounts.google.com/o/oauth2/auth",
   tokenUri: "https://oauth2.googleapis.com/token"
 };
