@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -21,15 +22,6 @@ import {
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
-// Google OAuth Configuration
-const googleOAuthConfig = {
-  clientId: "674049796284-u4jjioha7pgaubavllj8bj2u81vq0kuf.apps.googleusercontent.com",
-  clientSecret: "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",
-  redirectUri: "https://jdencffimqusolxqbnjw.supabase.co/auth/v1/callback flowName=GeneralOAuthFlow",
-  authUri: "https://accounts.google.com/o/oauth2/auth",
-  tokenUri: "https://oauth2.googleapis.com/token"
-};
-
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
@@ -51,9 +43,8 @@ const Auth = () => {
   const { signIn, signUp, loading, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [authError, setAuthError] = useState<string | null>(null);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   
+  // Get the page they were trying to visit
   const from = location.state?.from?.pathname || "/";
 
   const loginForm = useForm<LoginFormValues>({
@@ -74,47 +65,33 @@ const Auth = () => {
   });
 
   const onLoginSubmit = async (data: LoginFormValues) => {
-    setAuthError(null);
     try {
       await signIn(data.email, data.password);
       navigate(from, { replace: true });
     } catch (error) {
-      setAuthError("Failed to sign in. Please check your credentials.");
       console.error("Login error:", error);
     }
   };
 
   const onSignupSubmit = async (data: SignupFormValues) => {
-    setAuthError(null);
     try {
       await signUp(data.email, data.password);
-      // Consider adding a success message or redirect to verification page
+      // We don't redirect after signup as they need to confirm their email
     } catch (error) {
-      setAuthError("Failed to create account. Please try again.");
       console.error("Signup error:", error);
     }
   };
 
   const handleGoogleSignIn = async () => {
-    setAuthError(null);
-    setIsGoogleLoading(true);
     try {
-      await signInWithGoogle({
-        clientId: googleOAuthConfig.clientId,
-        redirectUri: googleOAuthConfig.redirectUri
-      });
-      navigate(from, { replace: true });
+      await signInWithGoogle();
     } catch (error) {
-      setAuthError("Google sign-in failed. Please try again.");
       console.error("Google sign in error:", error);
-    } finally {
-      setIsGoogleLoading(false);
     }
   };
 
   const toggleForm = () => {
     setIsLogin(!isLogin);
-    setAuthError(null);
   };
 
   return (
@@ -134,28 +111,16 @@ const Auth = () => {
               }
             </p>
           </div>
-
-          {/* Error Message */}
-          {authError && (
-            <div className="mb-4 p-3 text-sm text-red-600 bg-red-50 rounded-md">
-              {authError}
-            </div>
-          )}
           
           {/* Google Sign In Button */}
           <Button 
             variant="outline" 
             className="w-full mb-4 flex items-center justify-center gap-2"
             onClick={handleGoogleSignIn}
-            disabled={loading || isGoogleLoading}
+            disabled={loading}
           >
             <FcGoogle className="h-5 w-5" />
-            {isGoogleLoading 
-              ? "Processing..." 
-              : isLogin 
-                ? "Sign In with Google" 
-                : "Sign Up with Google"
-            }
+            {isLogin ? "Sign In with Google" : "Sign Up with Google"}
           </Button>
           
           <div className="relative my-6">
