@@ -81,7 +81,7 @@ const Index = () => {
               excerpt: 'Bipartisan effort introduces comprehensive bill addressing data privacy and platform accountability.',
               category: 'Politics',
               date: 'April 13, 2025',
-              imageUrl: 'https://images.unsplash.com/photo-1575320854760-bfffc858c21c?auto=format&fit=crop&q=80',
+              imageUrl: 'https://backend-live-coc.cfr.org/cdn/ff/9h1bEeqMIcPt85Qy2xkKs-EOZC57eEbb9Iq5xf5YZ3s/1734714256/public/publications/global-memos/2024-09-22T182830Z_837432971_RC2U5AAIH84C_RTRMADP_3_UN-SUMMIT%201%20%281%29.jpg?auto=format&fit=crop&q=80',
             }
           ]);
         }
