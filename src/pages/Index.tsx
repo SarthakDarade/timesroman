@@ -1,11 +1,15 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import FeaturedArticle from '../components/FeaturedArticle';
 import CategorySection from '../components/CategorySection';
-import ArticleCard from '../components/ArticleCard';
+import SEOHead from '../components/SEOHead';
 import { supabase } from '@/integrations/supabase/client';
+import { useIsMobile } from '@/hooks/use-mobile';
+
+// Lazy loaded components
+const ArticleCard = lazy(() => import('../components/ArticleCard'));
 
 interface Article {
   id: string;
@@ -22,10 +26,13 @@ interface Article {
 const Index = () => {
   const [featuredArticle, setFeaturedArticle] = useState<Article | null>(null);
   const [latestArticles, setLatestArticles] = useState<Article[]>([]);
-  const [politicsArticles, setPoliticsArticles] = useState<Article[]>([]);
-  const [technologyArticles, setTechnologyArticles] = useState<Article[]>([]);
-  const [businessArticles, setBusinessArticles] = useState<Article[]>([]);
+  const [categoryArticles, setCategoryArticles] = useState<Record<string, Article[]>>({});
   const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState<string[]>([]);
+  const isMobile = useIsMobile();
+  
+  // Categories we want to display (in order)
+  const desiredCategories = ['Politics', 'Technology', 'Business', 'Health', 'Entertainment'];
 
   useEffect(() => {
     // Set page title
@@ -60,57 +67,44 @@ const Index = () => {
           readTime: article.read_time
         }));
         
-        // Set featured article (first one for now, but could be filtered by a "featured" flag)
+        // Set featured article (first one for now)
         setFeaturedArticle(articles[0] || null);
         
         // Set latest articles (excluding featured)
         const latest = articles.slice(1, 5);
         setLatestArticles(latest);
         
-        // Filter by categories
-        setPoliticsArticles(articles.filter(a => a.category.toLowerCase() === 'politics').slice(0, 3));
-        setTechnologyArticles(articles.filter(a => a.category.toLowerCase() === 'technology').slice(0, 3));
-        setBusinessArticles(articles.filter(a => a.category.toLowerCase() === 'business').slice(0, 3));
+        // Group articles by category
+        const groupedByCategory: Record<string, Article[]> = {};
+        const availableCategories: string[] = [];
         
-        // If we don't have enough articles for a category, use mock data
-        if (politicsArticles.length === 0) {
-          setPoliticsArticles([
-            {
-              id: 'pol-mock-1',
-              title: 'New Legislation Aims to Reform Tech Regulation',
-              excerpt: 'Bipartisan effort introduces comprehensive bill addressing data privacy and platform accountability.',
-              category: 'Politics',
-              date: 'April 13, 2025',
-              imageUrl: 'https://backend-live-coc.cfr.org/cdn/ff/9h1bEeqMIcPt85Qy2xkKs-EOZC57eEbb9Iq5xf5YZ3s/1734714256/public/publications/global-memos/2024-09-22T182830Z_837432971_RC2U5AAIH84C_RTRMADP_3_UN-SUMMIT%201%20%281%29.jpg?auto=format&fit=crop&q=80',
-            }
-          ]);
-        }
+        articles.forEach(article => {
+          const category = article.category;
+          
+          if (!groupedByCategory[category]) {
+            groupedByCategory[category] = [];
+            availableCategories.push(category);
+          }
+          
+          if (groupedByCategory[category].length < 3) {
+            groupedByCategory[category].push(article);
+          }
+        });
         
-        if (technologyArticles.length === 0) {
-          setTechnologyArticles([
-            {
-              id: 'tech-mock-1',
-              title: 'Revolutionary Quantum Computing Breakthrough Announced',
-              excerpt: 'Scientists achieve stable quantum entanglement at room temperature, bringing practical quantum computing closer to reality.',
-              category: 'Technology',
-              date: 'April 14, 2025',
-              imageUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80',
-            }
-          ]);
-        }
+        // Sort categories according to desired order
+        const sortedCategories = desiredCategories.filter(
+          cat => availableCategories.includes(cat)
+        );
         
-        if (businessArticles.length === 0) {
-          setBusinessArticles([
-            {
-              id: 'bus-mock-1',
-              title: 'Sustainable Startups Attract Record Venture Capital',
-              excerpt: 'Green tech companies secure unprecedented funding as investors prioritize environmental impact.',
-              category: 'Business',
-              date: 'April 14, 2025',
-              imageUrl: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80',
-            }
-          ]);
-        }
+        // Add any categories we didn't explicitly list
+        availableCategories.forEach(cat => {
+          if (!sortedCategories.includes(cat)) {
+            sortedCategories.push(cat);
+          }
+        });
+        
+        setCategories(sortedCategories);
+        setCategoryArticles(groupedByCategory);
       } catch (err) {
         console.error('Error fetching articles:', err);
       } finally {
@@ -133,6 +127,7 @@ const Index = () => {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <SEOHead />
       <Navbar />
       
       <main className="flex-1">
@@ -145,12 +140,24 @@ const Index = () => {
           )}
         </section>
         
+        {/* Advertisement Banner */}
+        <div className="bg-gray-100 py-4 text-center">
+          <div className="container mx-auto px-4">
+            <div className="rounded-lg border border-dashed border-gray-300 bg-white p-2 shadow-sm">
+              <p className="text-sm text-gray-400">Advertisement</p>
+              <div className="mx-auto h-[90px] w-full max-w-[728px] bg-gray-200 flex items-center justify-center">
+                <span className="text-gray-500">Ad Slot - 728x90</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
         {/* Latest News Section */}
         <section className="bg-gray-50 py-8">
           <div className="container mx-auto px-4">
             <h2 className="mb-6 font-serif text-2xl font-bold">Latest News</h2>
             {loading ? (
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 {[...Array(4)].map((_, i) => (
                   <div key={i} className="animate-pulse">
                     <div className="aspect-[16/10] w-full bg-gray-200 rounded-lg"></div>
@@ -160,38 +167,47 @@ const Index = () => {
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-                {latestArticles.map((article) => (
-                  <ArticleCard key={article.id} {...article} />
-                ))}
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                <Suspense fallback={<div className="animate-pulse bg-gray-100 h-48 rounded-lg"></div>}>
+                  {latestArticles.map((article) => (
+                    <ArticleCard key={article.id} {...article} />
+                  ))}
+                </Suspense>
               </div>
             )}
           </div>
         </section>
         
-        {/* Category Sections */}
-        <CategorySection
-          title="Politics"
-          categoryPath="/category/politics"
-          articles={politicsArticles}
-          loading={loading}
-        />
-        
-        <div className="bg-gray-50">
-          <CategorySection
-            title="Technology"
-            categoryPath="/category/technology"
-            articles={technologyArticles}
-            loading={loading}
-          />
-        </div>
-        
-        <CategorySection
-          title="Business"
-          categoryPath="/category/business"
-          articles={businessArticles}
-          loading={loading}
-        />
+        {/* Dynamic Category Sections */}
+        {categories.map((category, index) => {
+          const articles = categoryArticles[category] || [];
+          if (articles.length === 0) return null;
+          
+          return (
+            <div key={category} className={index % 2 === 0 ? '' : 'bg-gray-50'}>
+              <CategorySection
+                title={category}
+                categoryPath={`/category/${category.toLowerCase()}`}
+                articles={articles}
+                loading={loading}
+              />
+              
+              {/* Ad slot after every other category */}
+              {index % 2 === 1 && (
+                <div className="bg-white py-6 text-center">
+                  <div className="container mx-auto px-4">
+                    <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-2 shadow-sm">
+                      <p className="text-sm text-gray-400">Advertisement</p>
+                      <div className="mx-auto h-[250px] max-w-full bg-gray-200 flex items-center justify-center">
+                        <span className="text-gray-500">{isMobile ? 'Mobile Ad - 300x250' : 'Desktop Ad - 970x250'}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </main>
       
       <Footer />

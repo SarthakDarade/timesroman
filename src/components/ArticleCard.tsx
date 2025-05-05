@@ -37,26 +37,40 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
       case 'entertainment': return 'category-entertainment';
       case 'sports': return 'category-sports';
       case 'politics': return 'bg-red-600';
+      case 'science': return 'bg-cyan-600';
       default: return 'bg-blue-600';
     }
+  };
+
+  // Generate a tiny placeholder for progressive loading
+  const createPlaceholder = () => {
+    return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzIDIiPjwvc3ZnPg==';
   };
 
   // Random view count for display if not provided
   const displayViews = views !== undefined ? views : Math.floor(Math.random() * 500) + 100;
 
   return (
-    <div className={`group overflow-hidden rounded-lg shadow-sm hover:shadow-xl transition-all duration-500 article-card-animate ${className}`} style={style}>
-      <Link to={`/article/${id}`} className="block">
-        <div className="aspect-[16/10] overflow-hidden">
+    <div 
+      className={`group overflow-hidden rounded-lg shadow-sm hover:shadow-xl transition-all duration-500 article-card-animate h-full flex flex-col ${className}`} 
+      style={style}
+    >
+      <Link to={`/article/${id}`} className="block h-full flex flex-col">
+        <div className="aspect-[16/10] overflow-hidden bg-gray-100">
           <img
             src={imageUrl}
             alt={title}
             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
             loading="lazy"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80';
+            }}
+            placeholder={createPlaceholder()}
           />
         </div>
-        <div className="p-4">
-          <div className="mb-2 flex items-center justify-between">
+        <div className="p-4 flex flex-col flex-grow">
+          <div className="mb-2 flex items-center justify-between flex-wrap gap-2">
             <span className={`inline-block text-xs font-medium uppercase tracking-wider px-2 py-1 rounded-full text-white ${getCategoryClass()}`}>
               {category}
             </span>
@@ -68,7 +82,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
           <h3 className="mb-2 font-serif text-lg font-semibold leading-snug tracking-tight text-gray-900 group-hover:text-blue-600 text-animate">
             {title}
           </h3>
-          <p className="line-clamp-2 text-sm text-gray-600">{excerpt}</p>
+          <p className="line-clamp-2 text-sm text-gray-600 flex-grow">{excerpt}</p>
           
           <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
             <div className="flex items-center">

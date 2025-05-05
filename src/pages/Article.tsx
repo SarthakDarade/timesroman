@@ -6,7 +6,7 @@ import Footer from '../components/Footer';
 import ArticlePage from '../components/ArticlePage';
 import ArticleCard from '../components/ArticleCard';
 import ReadingProgressBar from '../components/ReadingProgressBar';
-import AuthorAvatar from '../components/AuthorAvatar';
+import SEOHead from '../components/SEOHead';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Article {
@@ -58,6 +58,7 @@ const Article = () => {
           id: articleData.id,
           title: articleData.title,
           content: articleData.content || '',
+          excerpt: articleData.excerpt || '',
           category: articleData.category,
           date: articleData.date,
           author: articleData.author,
@@ -105,17 +106,6 @@ const Article = () => {
     fetchArticle();
   }, [id]);
 
-  useEffect(() => {
-    // Set page title
-    if (article) {
-      document.title = `${article.title} | Times Roman`;
-    }
-    
-    return () => {
-      document.title = 'Times Roman'; // Reset title on unmount
-    };
-  }, [article]);
-
   // Update view count when the article is viewed
   useEffect(() => {
     const updateViewCount = async () => {
@@ -152,6 +142,7 @@ const Article = () => {
   if (loading) {
     return (
       <div className="flex min-h-screen flex-col">
+        <SEOHead title="Loading Article | Times Roman" />
         <Navbar />
         <main className="container mx-auto flex-1 px-4 py-8">
           <div className="flex flex-col items-center justify-center py-12">
@@ -167,6 +158,7 @@ const Article = () => {
   if (!article) {
     return (
       <div className="flex min-h-screen flex-col">
+        <SEOHead title="Article Not Found | Times Roman" description="The article you're looking for doesn't exist or has been removed." />
         <Navbar />
         <main className="container mx-auto flex-1 px-4 py-8">
           <div className="flex flex-col items-center justify-center py-12">
@@ -190,6 +182,7 @@ const Article = () => {
     id: article.id,
     title: article.title,
     content: article.content || '',
+    excerpt: article.excerpt || '',
     category: article.category,
     date: article.date,
     author: article.author,
@@ -201,13 +194,42 @@ const Article = () => {
     likes: article.likes || 0,
   };
 
+  // Create ISO date format for SEO
+  const publishDate = new Date(article.date);
+  const isoDate = !isNaN(publishDate.getTime()) ? 
+    publishDate.toISOString() : 
+    new Date().toISOString();
+
   return (
     <div className="flex min-h-screen flex-col">
+      <SEOHead 
+        title={`${article.title} | Times Roman`}
+        description={article.excerpt || `Read about ${article.title} in our ${article.category} section.`}
+        ogImage={article.imageUrl}
+        ogType="article"
+        articleMeta={{
+          publishedTime: isoDate,
+          author: article.author,
+          category: article.category
+        }}
+      />
       <ReadingProgressBar />
       <Navbar />
       
       <main className="flex-1">
         <ArticlePage {...standardizedArticle} />
+        
+        {/* Ad slot between article and related content */}
+        <div className="bg-gray-100 py-6 text-center">
+          <div className="container mx-auto px-4">
+            <div className="rounded-lg border border-dashed border-gray-300 bg-white p-4 shadow-sm">
+              <p className="text-gray-400">Advertisement</p>
+              <div className="mx-auto h-[250px] max-w-[300px] bg-gray-200 flex items-center justify-center">
+                <span className="text-gray-500">Ad Slot - 300x250</span>
+              </div>
+            </div>
+          </div>
+        </div>
         
         {/* Related Articles Section */}
         <section className="bg-gray-50 py-12 animate-[fadeIn_1s_ease-in-out]">
