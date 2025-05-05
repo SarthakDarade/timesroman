@@ -7,6 +7,7 @@ import {
   TooltipTrigger 
 } from '@/components/ui/tooltip';
 import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/button';
 
 const DarkModeToggle = () => {
   // Check if user has a dark mode preference
@@ -39,19 +40,22 @@ const DarkModeToggle = () => {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <div className="flex items-center gap-2">
-          <Sun className="h-4 w-4 transition-all dark:hidden" />
-          <Moon className="hidden h-4 w-4 transition-all dark:block" />
-          <Switch 
-            checked={isDarkMode} 
-            onCheckedChange={setIsDarkMode}
-            aria-label="Toggle dark mode"
-            className="data-[state=checked]:bg-blue-600"
-          />
-        </div>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => setIsDarkMode(!isDarkMode)}
+          className="rounded-full w-9 h-9 p-0 transition-all duration-300"
+        >
+          {isDarkMode ? (
+            <Moon className="h-5 w-5 text-yellow-300 transition-all" />
+          ) : (
+            <Sun className="h-5 w-5 text-amber-500 transition-all" />
+          )}
+          <span className="sr-only">{isDarkMode ? 'Light mode' : 'Dark mode'}</span>
+        </Button>
       </TooltipTrigger>
       <TooltipContent>
-        <span>{isDarkMode ? 'Light mode' : 'Dark mode'}</span>
+        <span>Switch to {isDarkMode ? 'light mode' : 'dark mode'}</span>
       </TooltipContent>
     </Tooltip>
   );
