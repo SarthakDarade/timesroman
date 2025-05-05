@@ -2,8 +2,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
+import UserMenu from './UserMenu';
 import SearchBar from './SearchBar';
-import { NavbarActions } from './NavbarActions';
 
 const categories = [
   { name: "Politics", path: "/category/politics" },
@@ -18,7 +18,7 @@ const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className="border-b border-gray-200 bg-background text-foreground dark:border-gray-800">
+    <nav className="border-b border-gray-200 bg-white">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
@@ -35,7 +35,7 @@ const Navbar: React.FC = () => {
                 <Link
                   key={category.name}
                   to={category.path}
-                  className="text-sm font-medium text-foreground hover:text-black dark:hover:text-white transition-colors"
+                  className="text-sm font-medium text-gray-700 hover:text-black"
                 >
                   {category.name}
                 </Link>
@@ -47,12 +47,12 @@ const Navbar: React.FC = () => {
           <div className="flex items-center space-x-2">
             <SearchBar />
             
-            {/* Dark mode toggle and User Menu */}
-            <NavbarActions />
+            {/* User Menu */}
+            <UserMenu />
             
             {/* Mobile menu button */}
             <button
-              className="ml-2 inline-flex items-center justify-center p-2 rounded-md text-foreground hover:bg-accent hover:text-accent-foreground md:hidden"
+              className="ml-2 inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-700 md:hidden"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? (
@@ -73,7 +73,7 @@ const Navbar: React.FC = () => {
               <Link
                 key={category.name}
                 to={category.path}
-                className="block px-3 py-2 text-base font-medium text-foreground hover:bg-accent hover:text-accent-foreground"
+                className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-black"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {category.name}

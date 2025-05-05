@@ -41,33 +41,39 @@ const AuthCallback = () => {
   );
 };
 
+const AppContent = () => (
+  <AuthProvider>
+    <div className="app-container">
+      <ScrollToTop />
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/article/:id" element={<Article />} />
+        <Route path="/category/:categoryId" element={<Category />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        } />
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </div>
+  </AuthProvider>
+);
+
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <Toaster />
-      <Sonner />
-      <AuthProvider>
-        <div className="app-container">
-          <ScrollToTop />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/article/:id" element={<Article />} />
-            <Route path="/category/:categoryId" element={<Category />} />
-            <Route path="/search" element={<Search />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/auth/callback" element={<AuthCallback />} />
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            } />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </div>
-      </AuthProvider>
-    </BrowserRouter>
-  </QueryClientProvider>
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Toaster />
+        <Sonner />
+        <AppContent />
+      </BrowserRouter>
+    </QueryClientProvider>
+  </React.StrictMode>
 );
 
 export default App;

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import UserMenu from './UserMenu';
+import { UserMenu } from './UserMenu';
 import DarkModeToggle from './DarkModeToggle';
 
 export const NavbarActions: React.FC = () => {

@@ -7,8 +7,6 @@ import CategorySection from '../components/CategorySection';
 import SEOHead from '../components/SEOHead';
 import { supabase } from '@/integrations/supabase/client';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { ArrowUpIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 // Lazy loaded components
 const ArticleCard = lazy(() => import('../components/ArticleCard'));
@@ -31,25 +29,10 @@ const Index = () => {
   const [categoryArticles, setCategoryArticles] = useState<Record<string, Article[]>>({});
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<string[]>([]);
-  const [showScrollTop, setShowScrollTop] = useState(false);
   const isMobile = useIsMobile();
   
   // Categories we want to display (in order)
   const desiredCategories = ['Politics', 'Technology', 'Business', 'Health', 'Entertainment'];
-
-  useEffect(() => {
-    // Add scroll event listener
-    const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 500);
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
 
   useEffect(() => {
     // Set page title
@@ -143,49 +126,49 @@ const Index = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground transition-colors duration-300">
+    <div className="flex min-h-screen flex-col">
       <SEOHead />
       <Navbar />
       
       <main className="flex-1">
         {/* Hero Section with Featured Article */}
-        <section className="container mx-auto px-4 py-6 md:py-12">
+        <section className="container mx-auto px-4 py-6 md:py-8">
           {loading ? (
-            <div className="aspect-[16/9] w-full animate-pulse bg-muted rounded-lg"></div>
+            <div className="aspect-[16/9] w-full animate-pulse bg-gray-200 rounded-lg"></div>
           ) : (
             <FeaturedArticle {...(featuredArticle || fallbackFeaturedArticle)} />
           )}
         </section>
         
         {/* Advertisement Banner */}
-        <div className="bg-accent/30 py-4 text-center">
+        <div className="bg-gray-100 py-4 text-center">
           <div className="container mx-auto px-4">
-            <div className="rounded-lg border border-dashed border-border bg-card p-2 shadow-sm">
-              <p className="text-sm text-muted-foreground">Advertisement</p>
-              <div className="mx-auto h-[90px] w-full max-w-[728px] bg-muted flex items-center justify-center">
-                <span className="text-muted-foreground">Ad Slot - 728x90</span>
+            <div className="rounded-lg border border-dashed border-gray-300 bg-white p-2 shadow-sm">
+              <p className="text-sm text-gray-400">Advertisement</p>
+              <div className="mx-auto h-[90px] w-full max-w-[728px] bg-gray-200 flex items-center justify-center">
+                <span className="text-gray-500">Ad Slot - 728x90</span>
               </div>
             </div>
           </div>
         </div>
         
         {/* Latest News Section */}
-        <section className="bg-accent/20 py-10 md:py-16">
+        <section className="bg-gray-50 py-8">
           <div className="container mx-auto px-4">
-            <h2 className="mb-8 font-serif text-2xl md:text-3xl font-bold border-b border-border pb-2">Latest News</h2>
+            <h2 className="mb-6 font-serif text-2xl font-bold">Latest News</h2>
             {loading ? (
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 {[...Array(4)].map((_, i) => (
                   <div key={i} className="animate-pulse">
-                    <div className="aspect-[16/10] w-full bg-muted rounded-lg"></div>
-                    <div className="h-4 bg-muted rounded mt-4"></div>
-                    <div className="h-4 bg-muted rounded mt-2 w-3/4"></div>
+                    <div className="aspect-[16/10] w-full bg-gray-200 rounded-lg"></div>
+                    <div className="h-4 bg-gray-200 rounded mt-4"></div>
+                    <div className="h-4 bg-gray-200 rounded mt-2 w-3/4"></div>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                <Suspense fallback={<div className="animate-pulse bg-muted h-48 rounded-lg"></div>}>
+                <Suspense fallback={<div className="animate-pulse bg-gray-100 h-48 rounded-lg"></div>}>
                   {latestArticles.map((article) => (
                     <ArticleCard key={article.id} {...article} />
                   ))}
@@ -201,7 +184,7 @@ const Index = () => {
           if (articles.length === 0) return null;
           
           return (
-            <div key={category} className={index % 2 === 0 ? 'bg-background' : 'bg-accent/10'}>
+            <div key={category} className={index % 2 === 0 ? '' : 'bg-gray-50'}>
               <CategorySection
                 title={category}
                 categoryPath={`/category/${category.toLowerCase()}`}
@@ -211,12 +194,12 @@ const Index = () => {
               
               {/* Ad slot after every other category */}
               {index % 2 === 1 && (
-                <div className="py-6 text-center">
+                <div className="bg-white py-6 text-center">
                   <div className="container mx-auto px-4">
-                    <div className="rounded-lg border border-dashed border-border bg-muted/20 p-2 shadow-sm">
-                      <p className="text-sm text-muted-foreground">Advertisement</p>
-                      <div className="mx-auto h-[250px] max-w-full bg-muted flex items-center justify-center">
-                        <span className="text-muted-foreground">{isMobile ? 'Mobile Ad - 300x250' : 'Desktop Ad - 970x250'}</span>
+                    <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-2 shadow-sm">
+                      <p className="text-sm text-gray-400">Advertisement</p>
+                      <div className="mx-auto h-[250px] max-w-full bg-gray-200 flex items-center justify-center">
+                        <span className="text-gray-500">{isMobile ? 'Mobile Ad - 300x250' : 'Desktop Ad - 970x250'}</span>
                       </div>
                     </div>
                   </div>
@@ -226,17 +209,6 @@ const Index = () => {
           );
         })}
       </main>
-      
-      {/* Scroll to top button */}
-      {showScrollTop && (
-        <Button
-          className="fixed bottom-8 right-8 h-12 w-12 rounded-full p-0 shadow-lg transition-transform hover:scale-110"
-          onClick={scrollToTop}
-          aria-label="Scroll to top"
-        >
-          <ArrowUpIcon className="h-6 w-6" />
-        </Button>
-      )}
       
       <Footer />
     </div>

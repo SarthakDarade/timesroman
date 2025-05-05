@@ -23,19 +23,17 @@ const FeaturedArticle: React.FC<FeaturedArticleProps> = ({
   // Map category to color class
   const getCategoryClass = () => {
     switch (category.toLowerCase()) {
-      case 'technology': return 'bg-blue-600 dark:bg-blue-500';
-      case 'business': return 'bg-emerald-600 dark:bg-emerald-500';
-      case 'health': return 'bg-red-600 dark:bg-red-500';
-      case 'entertainment': return 'bg-purple-600 dark:bg-purple-500';
-      case 'sports': return 'bg-amber-600 dark:bg-amber-500';
-      case 'politics': return 'bg-orange-600 dark:bg-orange-500';
-      case 'science': return 'bg-cyan-600 dark:bg-cyan-500';
-      default: return 'bg-blue-600 dark:bg-blue-500';
+      case 'technology': return 'category-tech';
+      case 'business': return 'category-business';
+      case 'health': return 'category-health';
+      case 'entertainment': return 'category-entertainment';
+      case 'sports': return 'category-sports';
+      default: return 'bg-blue-600';
     }
   };
 
   return (
-    <div className="group relative overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+    <div className="group relative overflow-hidden rounded-lg hover-scale">
       <Link to={`/article/${id}`} className="block">
         {/* Image with gradient overlay */}
         <div className="relative aspect-[16/9] w-full overflow-hidden">
