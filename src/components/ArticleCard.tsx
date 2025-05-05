@@ -66,7 +66,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
               const target = e.target as HTMLImageElement;
               target.src = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80';
             }}
-            placeholder={createPlaceholder()}
+            // Removed the placeholder attribute as it's not valid on HTML img elements
           />
         </div>
         <div className="p-4 flex flex-col flex-grow">

@@ -20,24 +20,28 @@ const SEOHead: React.FC<SEOHeadProps> = ({
   description = 'Next-generation AI-powered news platform delivering fresh, unbiased perspectives on global events.',
   ogImage = 'https://i.ibb.co/Z6ffRH7K/Timesromancir-logo.png',
   ogType = 'website',
-  canonical = window.location.href,
+  canonical,
   articleMeta
 }) => {
   const siteName = 'Times Roman';
   const twitterHandle = '@timesroman';
+  
+  // Use window.location.href safely by checking if window exists (for SSR compatibility)
+  const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const canonicalUrl = canonical || currentUrl;
 
   return (
     <Helmet>
       {/* Basic Meta Tags */}
       <title>{title}</title>
       <meta name="description" content={description} />
-      <link rel="canonical" href={canonical} />
+      <link rel="canonical" href={canonicalUrl} />
 
       {/* Open Graph Tags */}
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={ogImage} />
-      <meta property="og:url" content={canonical} />
+      <meta property="og:url" content={canonicalUrl} />
       <meta property="og:type" content={ogType} />
       <meta property="og:site_name" content={siteName} />
 
