@@ -32,6 +32,9 @@ const Article = () => {
   const [relatedArticles, setRelatedArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   
+  // Get the current URL for canonical and OG tags
+  const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
+  
   useEffect(() => {
     // Fetch the article from Supabase
     const fetchArticle = async () => {
@@ -199,14 +202,37 @@ const Article = () => {
   const isoDate = !isNaN(publishDate.getTime()) ? 
     publishDate.toISOString() : 
     new Date().toISOString();
+    
+  // Generate article excerpt for social sharing
+  const getArticleDescription = () => {
+    if (article.excerpt && article.excerpt.trim().length > 0) {
+      return article.excerpt;
+    }
+    
+    // If no excerpt, extract text from the first paragraph(s) of content
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = article.content || '';
+    const paragraphs = tempDiv.querySelectorAll('p');
+    if (paragraphs.length > 0) {
+      const firstParagraphText = paragraphs[0].textContent || '';
+      return firstParagraphText.substring(0, 160) + (firstParagraphText.length > 160 ? '...' : '');
+    }
+    
+    // Fallback description
+    return `Read about ${article.title} in our ${article.category} section.`;
+  };
+
+  // Get the article description for sharing
+  const articleDescription = getArticleDescription();
 
   return (
     <div className="flex min-h-screen flex-col">
       <SEOHead 
         title={`${article.title} | Times Roman`}
-        description={article.excerpt || `Read about ${article.title} in our ${article.category} section.`}
+        description={articleDescription}
         ogImage={article.imageUrl}
         ogType="article"
+        canonical={currentUrl}
         articleMeta={{
           publishedTime: isoDate,
           author: article.author,
