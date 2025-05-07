@@ -30,16 +30,21 @@ const SEOHead: React.FC<SEOHeadProps> = ({
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
   const canonicalUrl = canonical || currentUrl;
 
+  // Ensure description is not too short (minimum 120 characters for SEO)
+  const enhancedDescription = description && description.length < 120 
+    ? `${description} Read more on Times Roman, the next-generation AI-powered news platform.` 
+    : description;
+
   return (
     <Helmet>
       {/* Basic Meta Tags */}
       <title>{title}</title>
-      <meta name="description" content={description} />
+      <meta name="description" content={enhancedDescription} />
       <link rel="canonical" href={canonicalUrl} />
 
       {/* Open Graph Tags */}
       <meta property="og:title" content={title} />
-      <meta property="og:description" content={description} />
+      <meta property="og:description" content={enhancedDescription} />
       <meta property="og:image" content={ogImage} />
       <meta property="og:url" content={canonicalUrl} />
       <meta property="og:type" content={ogType} />
@@ -49,8 +54,11 @@ const SEOHead: React.FC<SEOHeadProps> = ({
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:site" content={twitterHandle} />
       <meta name="twitter:title" content={title} />
-      <meta name="twitter:description" content={description} />
+      <meta name="twitter:description" content={enhancedDescription} />
       <meta name="twitter:image" content={ogImage} />
+      {/* Ensure preview works on WhatsApp */}
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
 
       {/* Article Specific Meta Tags */}
       {articleMeta && ogType === 'article' && (
@@ -66,6 +74,9 @@ const SEOHead: React.FC<SEOHeadProps> = ({
           )}
         </>
       )}
+      
+      {/* IndexNow API Key Tag */}
+      <meta name="msvalidate.01" content="YOUR_BING_VERIFICATION_ID" />
     </Helmet>
   );
 };

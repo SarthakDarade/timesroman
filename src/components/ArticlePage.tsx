@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+
+import React, { useEffect, useState, useRef } from 'react';
 import { 
   Clock, 
   Share2, 
@@ -58,6 +59,7 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
   const [isLiked, setIsLiked] = useState(false);
   const [viewCount, setViewCount] = useState(views);
   const { user } = useAuth();
+  const contentRef = useRef<HTMLDivElement>(null);
   
   // Effect to handle scroll progress
   useEffect(() => {
@@ -86,6 +88,28 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
     setViewCount(views);
     setLikeCount(likes);
   }, [id, views, likes]);
+  
+  // Process article content to add lazy loading to images and fix accessibility issues
+  useEffect(() => {
+    if (contentRef.current && content) {
+      // Add lazy loading to all images in the content
+      const contentImages = contentRef.current.querySelectorAll('img');
+      contentImages.forEach(img => {
+        img.setAttribute('loading', 'lazy');
+        if (!img.getAttribute('alt')) {
+          img.setAttribute('alt', `Image related to ${title}`);
+        }
+      });
+      
+      // Add accessibility attributes to links without text
+      const contentLinks = contentRef.current.querySelectorAll('a');
+      contentLinks.forEach(link => {
+        if (!link.textContent?.trim()) {
+          link.setAttribute('aria-label', 'Related article link');
+        }
+      });
+    }
+  }, [content, title]);
 
   // Function to handle share
   const handleShare = () => {
@@ -190,10 +214,12 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
         <Link 
           to={`/category/${category.toLowerCase()}`}
           className={`inline-block text-sm font-medium uppercase tracking-wider px-3 py-1 rounded-full text-white mb-2 ${getCategoryClass()}`}
+          aria-label={`${category} category`}
         >
           {category}
         </Link>
         
+        {/* H1 tag for SEO */}
         <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight text-gray-900 md:text-4xl lg:text-5xl animate-[fadeIn_0.7s_ease-in-out]">
           {title}
         </h1>
@@ -210,15 +236,15 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
             
             <div className="flex flex-wrap mt-2 md:mt-0 gap-4 text-sm text-gray-600">
               <div className="flex items-center">
-                <Calendar className="mr-1 h-4 w-4" />
+                <Calendar className="mr-1 h-4 w-4" aria-hidden="true" />
                 <span>{date}</span>
               </div>
               <div className="flex items-center">
-                <BookOpen className="mr-1 h-4 w-4" />
+                <BookOpen className="mr-1 h-4 w-4" aria-hidden="true" />
                 <span>{getReadTimeRange()} read</span>
               </div>
               <div className="flex items-center">
-                <Eye className="mr-1 h-4 w-4" />
+                <Eye className="mr-1 h-4 w-4" aria-hidden="true" />
                 <span>{viewCount} views</span>
               </div>
             </div>
@@ -230,22 +256,25 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
           <button 
             onClick={handleShare}
             className="flex items-center rounded-full bg-gray-100 px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 transition-all duration-200 hover:scale-105"
+            aria-label="Share article"
           >
-            <Share2 className="mr-2 h-4 w-4" />
+            <Share2 className="mr-2 h-4 w-4" aria-hidden="true" />
             Share
           </button>
           <button 
             onClick={handleBookmark}
             className={`flex items-center rounded-full ${isBookmarked ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'} px-4 py-2 text-sm hover:bg-gray-200 transition-all duration-200 hover:scale-105`}
+            aria-label={isBookmarked ? "Remove bookmark" : "Save article"}
           >
-            <Bookmark className={`mr-2 h-4 w-4 ${isBookmarked ? 'fill-blue-500' : ''}`} />
+            <Bookmark className={`mr-2 h-4 w-4 ${isBookmarked ? 'fill-blue-500' : ''}`} aria-hidden="true" />
             {isBookmarked ? 'Saved' : 'Save'}
           </button>
           <button 
             onClick={handleLike}
             className={`flex items-center rounded-full ${isLiked ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'} px-4 py-2 text-sm hover:bg-gray-200 transition-all duration-200 hover:scale-105`}
+            aria-label={isLiked ? "Remove like" : "Like article"}
           >
-            <ThumbsUp className={`mr-2 h-4 w-4 ${isLiked ? 'fill-red-500' : ''}`} />
+            <ThumbsUp className={`mr-2 h-4 w-4 ${isLiked ? 'fill-red-500' : ''}`} aria-hidden="true" />
             <span className="mr-1">{isLiked ? 'Liked' : 'Like'}</span>
             <span className="rounded-full bg-gray-200 px-2 py-px text-xs">{likeCount}</span>
           </button>
@@ -255,13 +284,22 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
       {/* Featured Image */}
       <div className="my-8 animate-[fadeIn_1.3s_ease-in-out]">
         <div className="mx-auto max-w-4xl overflow-hidden rounded-lg shadow-lg">
-          <img src={imageUrl} alt={title} className="w-full" />
+          <img 
+            src={imageUrl} 
+            alt={`Featured image for ${title}`} 
+            className="w-full" 
+            width="1200"
+            height="630"
+            loading="eager" 
+            importance="high"
+          />
         </div>
       </div>
 
       {/* Article Content */}
       <div className="mx-auto max-w-3xl">
         <div 
+          ref={contentRef}
           className="article-content prose prose-lg max-w-none reading-area animate-[fadeIn_1.5s_ease-in-out]" 
           dangerouslySetInnerHTML={{ __html: content }} 
         />
@@ -275,7 +313,12 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
             <div className="flex items-start space-x-4">
               {authorImage && (
                 <Avatar className="h-12 w-12 border-2 border-white">
-                  <img src={authorImage} alt={author} className="rounded-full" />
+                  <img 
+                    src={authorImage} 
+                    alt={`Photo of ${author}`} 
+                    className="rounded-full"
+                    loading="lazy"
+                  />
                 </Avatar>
               )}
               <div>
@@ -288,15 +331,24 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
         
         {/* Tags */}
         <div className="mt-8 flex flex-wrap gap-2 animate-[fadeIn_1.7s_ease-in-out]">
-          <span className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-800 hover:bg-gray-200 transition-all duration-200 hover:scale-105">
+          <Link 
+            to="/search?q=news" 
+            className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-800 hover:bg-gray-200 transition-all duration-200 hover:scale-105"
+          >
             #News
-          </span>
-          <span className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-800 hover:bg-gray-200 transition-all duration-200 hover:scale-105">
+          </Link>
+          <Link 
+            to={`/category/${category.toLowerCase()}`}
+            className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-800 hover:bg-gray-200 transition-all duration-200 hover:scale-105"
+          >
             #{category}
-          </span>
-          <span className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-800 hover:bg-gray-200 transition-all duration-200 hover:scale-105">
+          </Link>
+          <Link 
+            to="/" 
+            className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-800 hover:bg-gray-200 transition-all duration-200 hover:scale-105"
+          >
             #TimesRoman
-          </span>
+          </Link>
         </div>
       </div>
     </article>

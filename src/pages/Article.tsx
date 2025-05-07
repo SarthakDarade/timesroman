@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -31,11 +31,18 @@ const Article = () => {
   const [article, setArticle] = useState<Article | null>(null);
   const [relatedArticles, setRelatedArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
+  const isFirstRender = useRef(true);
   
   // Get the current URL for canonical and OG tags
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
   
   useEffect(() => {
+    // Redirect HTTP to HTTPS
+    if (typeof window !== 'undefined' && window.location.protocol === 'http:' && window.location.hostname !== 'localhost') {
+      window.location.href = window.location.href.replace('http:', 'https:');
+      return;
+    }
+
     // Fetch the article from Supabase
     const fetchArticle = async () => {
       if (!id) return;
@@ -112,7 +119,7 @@ const Article = () => {
   // Update view count when the article is viewed
   useEffect(() => {
     const updateViewCount = async () => {
-      if (!article || !id) return;
+      if (!article || !id || !isFirstRender.current) return;
       
       // Check if this article has been viewed in this session
       const viewedArticles = JSON.parse(localStorage.getItem('viewedArticles') || '{}');
@@ -137,6 +144,8 @@ const Article = () => {
           console.error('Error updating view count:', error);
         }
       }
+      
+      isFirstRender.current = false;
     };
     
     updateViewCount();
@@ -170,6 +179,7 @@ const Article = () => {
             <button 
               onClick={() => navigate('/')}
               className="mt-4 rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+              aria-label="Back to homepage"
             >
               Back to Homepage
             </button>
