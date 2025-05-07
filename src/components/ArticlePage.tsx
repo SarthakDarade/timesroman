@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { 
   Clock, 
@@ -290,8 +289,7 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
             className="w-full" 
             width="1200"
             height="630"
-            loading="eager" 
-            importance="high"
+            loading="eager"
           />
         </div>
       </div>
