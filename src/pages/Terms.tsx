@@ -104,7 +104,9 @@ const Terms: React.FC = () => {
                         Welcome to Times Roman. Please read these Terms of Service ("Terms") carefully as they contain important information regarding your legal rights, remedies, and obligations. By accessing or using the Times Roman website, mobile applications, or any other features or services offered by Times Roman (collectively, the "Services"), you agree to be bound by these Terms.
                       </p>
                     </section>
+                    <br> 
                     
+                    </br>
                     <section id="acceptance" className="scroll-mt-24">
                       <h2 className="font-serif text-2xl font-semibold">1. Acceptance of Terms</h2>
                       <div className="rounded-lg bg-gray-50 p-6">
@@ -125,7 +127,9 @@ const Terms: React.FC = () => {
                         You must be at least 18 years of age to use our Services. By using our Services, you represent and warrant that you have the legal capacity to enter into a binding agreement with Times Roman and are not barred from using the Services under the laws of your country of residence.
                       </p>
                     </section>
+                    <br> 
                     
+                    </br>
                     <section id="accounts" className="scroll-mt-24">
                       <h2 className="font-serif text-2xl font-semibold">3. User Accounts</h2>
                       <div className="mt-4 grid gap-4 md:grid-cols-2">
@@ -143,7 +147,9 @@ const Terms: React.FC = () => {
                         </div>
                       </div>
                     </section>
+                    <br> 
                     
+                    </br>
                     <section id="subscription" className="scroll-mt-24">
                       <h2 className="font-serif text-2xl font-semibold">4. Subscription and Billing</h2>
                       <p>
@@ -182,7 +188,9 @@ const Terms: React.FC = () => {
                         </table>
                       </div>
                     </section>
+                    <br> 
                     
+                    </br>
                     <section id="content" className="scroll-mt-24">
                       <h2 className="font-serif text-2xl font-semibold">5. Content</h2>
                       <p>
@@ -196,7 +204,9 @@ const Terms: React.FC = () => {
                         <li>The posting of your Content on or through the Services does not violate the privacy rights, publicity rights, copyrights, contract rights, or any other rights of any person.</li>
                       </ul>
                     </section>
+                    <br> 
                     
+                    </br>
                     <section id="intellectual" className="scroll-mt-24">
                       <h2 className="font-serif text-2xl font-semibold">6. Intellectual Property</h2>
                       <p>
@@ -206,7 +216,9 @@ const Terms: React.FC = () => {
                         Our trademarks and trade dress may not be used in connection with any product or service without the prior written consent of Times Roman.
                       </p>
                     </section>
+                    <br> 
                     
+                    </br>
                     <section id="liability" className="scroll-mt-24">
                       <h2 className="font-serif text-2xl font-semibold">7. Limitation of Liability</h2>
                       <p>
@@ -219,7 +231,9 @@ const Terms: React.FC = () => {
                         <li>unauthorized access, use, or alteration of your transmissions or content.</li>
                       </ul>
                     </section>
+                    <br> 
                     
+                    </br>
                     <section id="disclaimer" className="scroll-mt-24">
                       <h2 className="font-serif text-2xl font-semibold">8. Disclaimer</h2>
                       <div className="rounded-lg bg-gray-50 p-6">
@@ -228,14 +242,18 @@ const Terms: React.FC = () => {
                         </p>
                       </div>
                     </section>
+                    <br> 
                     
+                    </br>
                     <section id="governing-law" className="scroll-mt-24">
                       <h2 className="font-serif text-2xl font-semibold">9. Governing Law</h2>
                       <p>
                         These Terms shall be governed and construed in accordance with the laws of the United States, without regard to its conflict of law provisions. Our failure to enforce any right or provision of these Terms will not be considered a waiver of those rights.
                       </p>
                     </section>
+                    <br> 
                     
+                    </br>
                     <section id="changes" className="scroll-mt-24">
                       <h2 className="font-serif text-2xl font-semibold">10. Changes to Terms</h2>
                       <p>
@@ -249,7 +267,9 @@ const Terms: React.FC = () => {
                         </p>
                       </div>
                     </section>
+                    <br> 
                     
+                    </br>
                     <section id="contact" className="scroll-mt-24">
                       <h2 className="font-serif text-2xl font-semibold">11. Contact Us</h2>
                       <p>
