@@ -278,9 +278,9 @@ const Terms: React.FC = () => {
                       <div className="mt-4 rounded-lg bg-gray-50 p-6">
                         <p className="font-medium">Times Roman Legal Department</p>
                         <p>
-                          Email: legal@timesroman.com<br />
-                          Phone: +1 (555) 123-4567<br />
-                          Address: 123 News Avenue, New York, NY 10001, United States
+                          Email: legal@timesroman.in<br />
+                          Phone: +91 (218) 635-9265<br />
+                          Address: Solapur, Maharashtra 413304
                         </p>
                       </div>
                     </section>
