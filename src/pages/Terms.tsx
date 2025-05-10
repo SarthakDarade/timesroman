@@ -248,7 +248,7 @@ const Terms: React.FC = () => {
                     <section id="governing-law" className="scroll-mt-24">
                       <h2 className="font-serif text-2xl font-semibold">9. Governing Law</h2>
                       <p>
-                        These Terms shall be governed and construed in accordance with the laws of the United States, without regard to its conflict of law provisions. Our failure to enforce any right or provision of these Terms will not be considered a waiver of those rights.
+                        These Terms shall be governed and construed in accordance with the laws of the India, without regard to its conflict of law provisions. Our failure to enforce any right or provision of these Terms will not be considered a waiver of those rights.
                       </p>
                     </section>
                     <br> 
