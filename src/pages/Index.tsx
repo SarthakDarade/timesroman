@@ -32,7 +32,22 @@ const Index = () => {
   const isMobile = useIsMobile();
   
   // Categories we want to display (in order)
-  const desiredCategories = ['Politics', 'Technology', 'Business', 'Health', 'Entertainment'];
+  const desiredCategories = [
+    'Latest News', 
+    'Politics', 
+    'Technology', 
+    'Technology News', 
+    'Business', 
+    'Business News', 
+    'World News', 
+    'US News', 
+    'India News', 
+    'Entertainment News', 
+    'Sports News', 
+    'Cricket', 
+    'Government News', 
+    'Press Releases'
+  ];
 
   useEffect(() => {
     // Set page title
@@ -91,17 +106,10 @@ const Index = () => {
           }
         });
         
-        // Sort categories according to desired order
+        // Filter and sort categories according to desired order
         const sortedCategories = desiredCategories.filter(
           cat => availableCategories.includes(cat)
         );
-        
-        // Add any categories we didn't explicitly list
-        availableCategories.forEach(cat => {
-          if (!sortedCategories.includes(cat)) {
-            sortedCategories.push(cat);
-          }
-        });
         
         setCategories(sortedCategories);
         setCategoryArticles(groupedByCategory);
@@ -178,7 +186,7 @@ const Index = () => {
           </div>
         </section>
         
-        {/* Dynamic Category Sections */}
+        {/* Dynamic Category Sections - Only show desired categories */}
         {categories.map((category, index) => {
           const articles = categoryArticles[category] || [];
           if (articles.length === 0) return null;
