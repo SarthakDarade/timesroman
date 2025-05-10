@@ -9,12 +9,12 @@ import { supabase } from '@/integrations/supabase/client';
 export const enableRealtimeForTable = async (tableName: string) => {
   try {
     // Enable replica identity for the table (required for realtime)
-    await supabase.rpc('extensions.notify_replica_identity', { 
+    await supabase.rpc('notify_replica_identity', { 
       table_name: tableName 
     });
     
     // Add the table to the realtime publication
-    await supabase.rpc('extensions.notify_realtime', { 
+    await supabase.rpc('notify_realtime', { 
       table_name: tableName,
       enable: true 
     });
