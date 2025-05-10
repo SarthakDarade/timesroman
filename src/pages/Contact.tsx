@@ -79,9 +79,9 @@ const Contact: React.FC = () => {
                     <div>
                       <h3 className="mb-2 text-lg font-medium">Our Location</h3>
                       <p className="text-gray-600">
-                        123 News Avenue<br />
-                        New York, NY 10001<br />
-                        United States
+                        Solapur<br />
+                        Maharashtra, PC - 413304<br />
+                        India
                       </p>
                     </div>
                   </div>
@@ -93,8 +93,8 @@ const Contact: React.FC = () => {
                     <div>
                       <h3 className="mb-2 text-lg font-medium">Phone</h3>
                       <p className="text-gray-600">
-                        Main Office: +1 (555) 123-4567<br />
-                        News Tips: +1 (555) 987-6543
+                        Main Office: +91 (218) 635-9265<br />
+                        News Tips: +91 (218) 635-9265
                       </p>
                     </div>
                   </div>
@@ -118,7 +118,7 @@ const Contact: React.FC = () => {
                 <div className="mt-10">
                   <h3 className="mb-4 text-xl font-medium">Find Us</h3>
                   <MapComponent 
-                    address="123 News Avenue, New York, NY 10001" 
+                    address="Solapur, Maharashtra" 
                     className="h-[300px] w-full shadow-md"
                   />
                 </div>
