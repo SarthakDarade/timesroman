@@ -18,7 +18,7 @@ interface SEOHeadProps {
 const SEOHead: React.FC<SEOHeadProps> = ({
   title = 'Times Roman - AI-Powered News',
   description = 'Next-generation AI-powered news platform delivering fresh, unbiased perspectives on global events.',
-  ogImage = 'https://kgo.googleusercontent.com/profile_vrt_raw_bytes_1587515358_10512.png',
+  ogImage = 'https://i.ibb.co/Z6ffRH7K/Timesromancir-logo.png',
   ogType = 'website',
   canonical,
   articleMeta
