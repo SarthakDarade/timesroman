@@ -116,7 +116,9 @@ const Terms: React.FC = () => {
                         </p>
                       </div>
                     </section>
+                    <br> 
                     
+                    </br>
                     <section id="eligibility" className="scroll-mt-24">
                       <h2 className="font-serif text-2xl font-semibold">2. Eligibility</h2>
                       <p>
