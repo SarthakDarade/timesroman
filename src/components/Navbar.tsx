@@ -14,12 +14,10 @@ import {
 const mainCategories = [
   { name: "Politics", path: "/category/politics" },
   { name: "Technology", path: "/category/technology" },
-  { name: "Technology News", path: "/category/technology-news" },
   { name: "Business", path: "/category/business" },
-  { name: "Business News", path: "/category/business-news" },
   { name: "World News", path: "/category/world-news" },  // Replaced Science
-  { name: "US News", path: "/category/us-news" },
-  { name: "India News", path: "/category/india-news" },
+  { name: "Sports News", path: "/category/sports-news" },
+  { name: "Entertainment", path: "/category/entertainment" },
 ];
 
 const moreCategories = [
@@ -32,7 +30,6 @@ const moreCategories = [
   { name: "Health", path: "/category/health" },
   { name: "Entertainment", path: "/category/entertainment" },
   { name: "Lifestyle", path: "/category/lifestyle" },
-  { name: "Environment", path: "/category/environment" },
 ];
 
 const Navbar: React.FC = () => {
