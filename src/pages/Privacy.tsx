@@ -101,7 +101,9 @@ const Privacy: React.FC = () => {
                         At Times Roman, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website or use our services. Please read this policy carefully. If you do not agree with the terms of this privacy policy, please do not access the site.
                       </p>
                     </section>
+                    <br> 
                     
+                    </br>
                     <section id="information-collect" className="scroll-mt-24">
                       <h2 className="font-serif text-2xl font-semibold">Information We Collect</h2>
                       
@@ -119,7 +121,7 @@ const Privacy: React.FC = () => {
                           <li>Billing information</li>
                         </ul>
                       </div>
-                      
+        
                       <div className="mt-6 rounded-lg bg-gray-50 p-6">
                         <h3 className="font-serif text-xl font-medium">Automatically Collected Information</h3>
                         <p>
@@ -135,7 +137,9 @@ const Privacy: React.FC = () => {
                         </ul>
                       </div>
                     </section>
+                    <br> 
                     
+                    </br>
                     <section id="information-use" className="scroll-mt-24">
                       <h2 className="font-serif text-2xl font-semibold">How We Use Your Information</h2>
                       <p>
@@ -152,7 +156,9 @@ const Privacy: React.FC = () => {
                         <li>Finding and preventing fraud</li>
                       </ul>
                     </section>
+                    <br> 
                     
+                    </br>
                     <section id="cookies" className="scroll-mt-24">
                       <h2 className="font-serif text-2xl font-semibold">Cookies and Tracking Technologies</h2>
                       <p>
@@ -174,21 +180,27 @@ const Privacy: React.FC = () => {
                         </div>
                       </div>
                     </section>
+                    <br> 
                     
+                    </br>
                     <section id="third-party" className="scroll-mt-24">
                       <h2 className="font-serif text-2xl font-semibold">Third-Party Services</h2>
                       <p>
                         We may use third-party services such as Google Analytics, advertising networks, and social media platforms that collect, monitor, and analyze data to improve our service. These third parties have their own privacy policies addressing how they use such information.
                       </p>
                     </section>
+                    <br> 
                     
+                    </br>
                     <section id="data-security" className="scroll-mt-24">
                       <h2 className="font-serif text-2xl font-semibold">Data Security</h2>
                       <p>
                         We have implemented appropriate technical and organizational security measures designed to protect the security of any personal information we process. However, please also remember that we cannot guarantee that the internet itself is 100% secure. Although we will do our best to protect your personal information, transmission of personal information to and from our website is at your own risk.
                       </p>
                     </section>
+                    <br> 
                     
+                    </br>
                     <section id="data-rights" className="scroll-mt-24">
                       <h2 className="font-serif text-2xl font-semibold">Your Data Protection Rights</h2>
                       <p>
@@ -224,14 +236,18 @@ const Privacy: React.FC = () => {
                         To exercise any of these rights, please contact us using the information provided in the "Contact Us" section.
                       </p>
                     </section>
+                    <br> 
                     
+                    </br>
                     <section id="policy-changes" className="scroll-mt-24">
                       <h2 className="font-serif text-2xl font-semibold">Changes to This Privacy Policy</h2>
                       <p>
                         We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last updated" date. You are advised to review this Privacy Policy periodically for any changes.
                       </p>
                     </section>
+                    <br> 
                     
+                    </br>
                     <section id="contact" className="scroll-mt-24">
                       <h2 className="font-serif text-2xl font-semibold">Contact Us</h2>
                       <p>
