@@ -23,7 +23,7 @@ const About: React.FC = () => {
             <div className="mx-auto max-w-3xl text-center">
               <h1 className="mb-6 font-serif text-4xl font-bold md:text-5xl lg:text-6xl">About Times Roman</h1>
               <p className="text-lg text-gray-700 md:text-xl">
-                Delivering timely, accurate, and comprehensive news coverage since 2023.
+                Delivering timely, accurate, and comprehensive news coverage since 2025.
               </p>
             </div>
           </div>
@@ -36,7 +36,7 @@ const About: React.FC = () => {
               <h2 className="mb-8 font-serif text-3xl font-semibold">Our Story</h2>
               <div className="prose prose-lg max-w-none">
                 <p>
-                  Times Roman was founded in 2023 with a mission to provide unbiased, fact-based news coverage in a world increasingly divided by polarized media. We believe in the power of informed citizens to make better decisions for society when they have access to reliable information.
+                  Times Roman was founded in 2025 with a mission to provide unbiased, fact-based news coverage in a world increasingly divided by polarized media. We believe in the power of informed citizens to make better decisions for society when they have access to reliable information.
                 </p>
                 
                 <p>
