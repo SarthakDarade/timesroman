@@ -50,13 +50,6 @@ const Navbar: React.FC = () => {
           {/* Navigation - Desktop */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-center space-x-8">
-              {/* Latest News is not in main categories but should appear first */}
-              <Link
-                to="/category/latest-news"
-                className="text-sm font-medium text-gray-700 hover:text-black"
-              >
-                Latest News
-              </Link>
               
               {mainCategories.map((category) => (
                 <Link
@@ -120,14 +113,6 @@ const Navbar: React.FC = () => {
       {isMenuOpen && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            {/* Latest News for mobile */}
-            <Link
-              to="/category/latest-news"
-              className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-black"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Latest News
-            </Link>
             
             {/* Main categories for mobile */}
             {mainCategories.map((category) => (
