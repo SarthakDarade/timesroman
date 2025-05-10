@@ -32,14 +32,55 @@ const CategorySection: React.FC<CategorySectionProps> = ({
 }) => {
   // Get gradient background based on title
   const getGradientClass = () => {
-    switch (title.toLowerCase()) {
-      case 'technology': return 'gradient-bg-1';
-      case 'business': return 'gradient-bg-2';
-      case 'health': return 'gradient-bg-3';
-      case 'politics': return 'gradient-bg-4';
-      case 'entertainment': return 'gradient-bg-5';
-      case 'science': return 'gradient-bg-6';
-      default: return '';
+    const normalizedTitle = title.toLowerCase().replace(/\s+/g, '-');
+    
+    switch (normalizedTitle) {
+      case 'technology': return 'bg-gradient-to-r from-purple-50 to-indigo-50';
+      case 'business': return 'bg-gradient-to-r from-emerald-50 to-teal-50';
+      case 'politics': return 'bg-gradient-to-r from-indigo-50 to-blue-50';
+      case 'health': return 'bg-gradient-to-r from-orange-50 to-amber-50';
+      case 'science': return 'bg-gradient-to-r from-cyan-50 to-sky-50';
+      case 'entertainment': return 'bg-gradient-to-r from-pink-50 to-rose-50';
+      case 'world-news': return 'bg-gradient-to-r from-blue-50 to-sky-50';
+      case 'us-news': return 'bg-gradient-to-r from-red-50 to-orange-50';
+      case 'india-news': return 'bg-gradient-to-r from-amber-50 to-orange-50';
+      case 'sports-news': return 'bg-gradient-to-r from-green-50 to-emerald-50';
+      case 'cricket': return 'bg-gradient-to-r from-green-50 to-teal-50';
+      case 'government-news': return 'bg-gradient-to-r from-slate-50 to-gray-50';
+      case 'press-releases': return 'bg-gradient-to-r from-gray-50 to-slate-50';
+      case 'latest-news': return 'bg-gradient-to-r from-blue-50 to-blue-100';
+      case 'technology-news': return 'bg-gradient-to-r from-indigo-50 to-purple-50';
+      case 'business-news': return 'bg-gradient-to-r from-teal-50 to-emerald-50';
+      case 'entertainment-news': return 'bg-gradient-to-r from-rose-50 to-pink-50';
+      case 'lifestyle': return 'bg-gradient-to-r from-violet-50 to-purple-50';
+      default: return 'bg-gray-50';
+    }
+  };
+
+  // Get border color for section header
+  const getBorderColor = () => {
+    const normalizedTitle = title.toLowerCase().replace(/\s+/g, '-');
+    
+    switch (normalizedTitle) {
+      case 'technology': return 'after:bg-purple-600';
+      case 'business': return 'after:bg-emerald-600';
+      case 'politics': return 'after:bg-indigo-600';
+      case 'health': return 'after:bg-orange-600';
+      case 'science': return 'after:bg-cyan-600';
+      case 'entertainment': return 'after:bg-pink-600';
+      case 'world-news': return 'after:bg-blue-600';
+      case 'us-news': return 'after:bg-red-600';
+      case 'india-news': return 'after:bg-amber-600';
+      case 'sports-news': return 'after:bg-green-600';
+      case 'cricket': return 'after:bg-teal-600';
+      case 'government-news': return 'after:bg-slate-600';
+      case 'press-releases': return 'after:bg-gray-600';
+      case 'latest-news': return 'after:bg-blue-600';
+      case 'technology-news': return 'after:bg-indigo-600';
+      case 'business-news': return 'after:bg-teal-600';
+      case 'entertainment-news': return 'after:bg-rose-600';
+      case 'lifestyle': return 'after:bg-violet-600';
+      default: return 'after:bg-blue-600';
     }
   };
 
@@ -47,7 +88,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
     <section className={`py-8 md:py-12 ${getGradientClass()}`}>
       <div className="container mx-auto px-4">
         <div className="mb-6 md:mb-8 flex items-center justify-between flex-wrap animate-[fadeIn_0.5s_ease-in-out]">
-          <h2 className="font-serif text-2xl md:text-3xl font-bold relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-1/3 after:h-1 after:bg-blue-600">
+          <h2 className={`font-serif text-2xl md:text-3xl font-bold relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-1/3 after:h-1 ${getBorderColor()}`}>
             {title}
           </h2>
           <Link to={categoryPath} className="mt-2 md:mt-0">

@@ -32,6 +32,18 @@ const categoryTitles: Record<string, string> = {
   science: "Science",
   health: "Health",
   entertainment: "Entertainment",
+  "world-news": "World News",
+  "us-news": "US News",
+  "india-news": "India News",
+  "entertainment-news": "Entertainment News",
+  "sports-news": "Sports News",
+  cricket: "Cricket",
+  "government-news": "Government News",
+  "press-releases": "Press Releases",
+  "latest-news": "Latest News",
+  "technology-news": "Technology News",
+  "business-news": "Business News",
+  lifestyle: "Lifestyle",
 };
 
 const categoryDescriptions: Record<string, string> = {
@@ -41,13 +53,25 @@ const categoryDescriptions: Record<string, string> = {
   science: "Explore the latest discoveries, research breakthroughs, and scientific advancements across various disciplines.",
   health: "Find valuable information on medical research, wellness trends, and healthcare developments for a healthier lifestyle.",
   entertainment: "Keep up with the latest in movies, music, television, celebrity news, and cultural phenomena.",
+  "world-news": "Get global coverage of international events, geopolitical developments, and stories from around the world.",
+  "us-news": "Stay updated with the latest headlines, politics, and developments from across the United States.",
+  "india-news": "Follow current events, politics, economy, and cultural stories from India.",
+  "entertainment-news": "The latest updates on movies, music, celebrities, and entertainment industry trends.",
+  "sports-news": "Breaking news, results, and analysis from the world of sports.",
+  cricket: "Match results, player statistics, and the latest updates from cricket tournaments worldwide.",
+  "government-news": "Official announcements, policy changes, and government affairs coverage.",
+  "press-releases": "The latest official announcements from organizations and institutions.",
+  "latest-news": "Breaking stories and the most recent updates across all categories.",
+  "technology-news": "The latest developments and breaking stories from the tech industry.",
+  "business-news": "Recent financial updates, market movements, and business developments.",
+  lifestyle: "Articles on wellness, fashion, food, travel, and personal development.",
 };
 
 const Category = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
   const normalizedCategoryId = categoryId?.toLowerCase() || '';
   
-  const categoryTitle = categoryId ? categoryTitles[normalizedCategoryId] || categoryId : '';
+  const categoryTitle = categoryId ? categoryTitles[normalizedCategoryId] || categoryId.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : '';
   const categoryDescription = categoryId ? categoryDescriptions[normalizedCategoryId] || '' : '';
   
   const [articles, setArticles] = useState<Article[]>([]);
@@ -72,11 +96,15 @@ const Category = () => {
       setLoading(true);
       
       try {
+        // Get the actual category name from the URL param
+        const actualCategoryName = categoryTitles[normalizedCategoryId] || 
+          categoryId?.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        
         // Fetch articles from this category
         const { data, error } = await supabase
           .from('articles')
           .select('*')
-          .eq('category', categoryTitle)
+          .eq('category', actualCategoryName)
           .order('created_at', { ascending: false });
           
         if (error) {
@@ -109,10 +137,32 @@ const Category = () => {
     
     fetchCategoryArticles();
     
+    // Set up real-time subscription for this category
+    const actualCategoryName = categoryTitles[normalizedCategoryId] || 
+      categoryId?.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    
+    const channel = supabase
+      .channel('public:articles:category-changes')
+      .on('postgres_changes', 
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'articles',
+          filter: `category=eq.${actualCategoryName}` 
+        }, 
+        (payload) => {
+          console.log('Article change detected:', payload);
+          // Refetch articles when changes occur
+          fetchCategoryArticles();
+        }
+      )
+      .subscribe();
+    
     return () => {
       document.title = 'Times Roman'; // Reset title on unmount
+      supabase.removeChannel(channel);
     };
-  }, [categoryId, categoryTitle]);
+  }, [categoryId, categoryTitle, normalizedCategoryId]);
   
   const loadMore = () => {
     setVisibleArticles((prev) => prev + 3);
@@ -147,6 +197,18 @@ const Category = () => {
       case 'health': return 'from-orange-600 to-amber-600';
       case 'science': return 'from-cyan-600 to-sky-600';
       case 'entertainment': return 'from-pink-600 to-rose-600';
+      case 'world-news': return 'from-blue-600 to-sky-600';
+      case 'us-news': return 'from-red-600 to-orange-600';
+      case 'india-news': return 'from-amber-600 to-orange-600';
+      case 'sports-news': return 'from-green-600 to-emerald-600';
+      case 'cricket': return 'from-green-600 to-teal-600';
+      case 'government-news': return 'from-slate-600 to-gray-600';
+      case 'press-releases': return 'from-gray-600 to-slate-600';
+      case 'latest-news': return 'from-blue-700 to-blue-500';
+      case 'technology-news': return 'from-indigo-700 to-purple-500';
+      case 'business-news': return 'from-teal-700 to-emerald-500';
+      case 'entertainment-news': return 'from-rose-600 to-pink-400';
+      case 'lifestyle': return 'from-violet-600 to-purple-400';
       default: return 'from-gray-700 to-gray-900';
     }
   };

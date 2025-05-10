@@ -7,6 +7,7 @@ import CategorySection from '../components/CategorySection';
 import SEOHead from '../components/SEOHead';
 import { supabase } from '@/integrations/supabase/client';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { subscribeToArticleChanges } from '@/utils/realtimeHelpers';
 
 // Lazy loaded components
 const ArticleCard = lazy(() => import('../components/ArticleCard'));
@@ -49,78 +50,89 @@ const Index = () => {
     'Press Releases'
   ];
 
+  // Fetch all articles
+  const fetchArticles = async () => {
+    setLoading(true);
+    
+    try {
+      // Fetch all articles
+      const { data, error } = await supabase
+        .from('articles')
+        .select('*')
+        .order('created_at', { ascending: false });
+        
+      if (error) {
+        console.error('Error fetching articles:', error);
+        return;
+      }
+      
+      // Format articles
+      const articles = data.map(article => ({
+        id: article.id,
+        title: article.title,
+        excerpt: article.excerpt || article.content?.substring(0, 120) || '',
+        content: article.content,
+        category: article.category,
+        date: article.date,
+        author: article.author,
+        imageUrl: article.image_url,
+        readTime: article.read_time
+      }));
+      
+      // Set featured article (first one for now)
+      setFeaturedArticle(articles[0] || null);
+      
+      // Set latest articles (excluding featured)
+      const latest = articles.slice(1, 5);
+      setLatestArticles(latest);
+      
+      // Group articles by category
+      const groupedByCategory: Record<string, Article[]> = {};
+      const availableCategories: string[] = [];
+      
+      articles.forEach(article => {
+        const category = article.category;
+        
+        if (!groupedByCategory[category]) {
+          groupedByCategory[category] = [];
+          availableCategories.push(category);
+        }
+        
+        if (groupedByCategory[category].length < 3) {
+          groupedByCategory[category].push(article);
+        }
+      });
+      
+      // Filter and sort categories according to desired order
+      const sortedCategories = desiredCategories.filter(
+        cat => availableCategories.includes(cat)
+      );
+      
+      setCategories(sortedCategories);
+      setCategoryArticles(groupedByCategory);
+    } catch (err) {
+      console.error('Error fetching articles:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     // Set page title
     document.title = 'Times Roman | Latest News and Articles';
     
-    // Fetch all articles
-    const fetchArticles = async () => {
-      setLoading(true);
-      
-      try {
-        // Fetch all articles
-        const { data, error } = await supabase
-          .from('articles')
-          .select('*')
-          .order('created_at', { ascending: false });
-          
-        if (error) {
-          console.error('Error fetching articles:', error);
-          return;
-        }
-        
-        // Format articles
-        const articles = data.map(article => ({
-          id: article.id,
-          title: article.title,
-          excerpt: article.excerpt || article.content?.substring(0, 120) || '',
-          content: article.content,
-          category: article.category,
-          date: article.date,
-          author: article.author,
-          imageUrl: article.image_url,
-          readTime: article.read_time
-        }));
-        
-        // Set featured article (first one for now)
-        setFeaturedArticle(articles[0] || null);
-        
-        // Set latest articles (excluding featured)
-        const latest = articles.slice(1, 5);
-        setLatestArticles(latest);
-        
-        // Group articles by category
-        const groupedByCategory: Record<string, Article[]> = {};
-        const availableCategories: string[] = [];
-        
-        articles.forEach(article => {
-          const category = article.category;
-          
-          if (!groupedByCategory[category]) {
-            groupedByCategory[category] = [];
-            availableCategories.push(category);
-          }
-          
-          if (groupedByCategory[category].length < 3) {
-            groupedByCategory[category].push(article);
-          }
-        });
-        
-        // Filter and sort categories according to desired order
-        const sortedCategories = desiredCategories.filter(
-          cat => availableCategories.includes(cat)
-        );
-        
-        setCategories(sortedCategories);
-        setCategoryArticles(groupedByCategory);
-      } catch (err) {
-        console.error('Error fetching articles:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
+    // Initial fetch
     fetchArticles();
+    
+    // Set up real-time subscription for article changes
+    const cleanup = subscribeToArticleChanges((payload) => {
+      console.log('Article change detected:', payload);
+      fetchArticles();
+    });
+    
+    return () => {
+      cleanup();
+    };
   }, []);
 
   // Fallback featured article when loading or no data
