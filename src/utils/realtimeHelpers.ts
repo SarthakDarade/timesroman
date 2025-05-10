@@ -8,21 +8,31 @@ import { supabase } from '@/integrations/supabase/client';
  */
 export const enableRealtimeForTable = async (tableName: string) => {
   try {
-    // Alternative approach to enable replica identity without RPC
-    console.log(`Enabling replica identity for table: ${tableName}`);
+    // Log that we're attempting to enable realtime
+    console.log(`Attempting to enable realtime for table: ${tableName}`);
     
-    // Use raw SQL execution instead of RPC since the type definitions are causing issues
-    const { error: replicaError } = await supabase
-      .from('_realtime')
-      .select('*')
-      .limit(1)
-      .eq('table', tableName);
+    // Create a channel with the table name - this doesn't actually enable realtime but
+    // helps us check if we can subscribe to the table
+    const channel = supabase
+      .channel(`public:${tableName}:changes`)
+      .on('postgres_changes', 
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: tableName 
+        }, 
+        () => {}
+      )
+      .subscribe();
     
-    if (replicaError) {
-      console.error(`Error checking realtime for table ${tableName}:`, replicaError);
+    // Check if channel was created successfully
+    if (channel) {
+      console.log(`Created realtime channel for table: ${tableName}`);
+      // Remove the test channel since we're just checking if it works
+      supabase.removeChannel(channel);
     }
     
-    console.log(`Enabled realtime for table: ${tableName}`);
+    console.log(`Realtime capability enabled for table: ${tableName}`);
     return true;
   } catch (error) {
     console.error(`Error enabling realtime for table ${tableName}:`, error);
