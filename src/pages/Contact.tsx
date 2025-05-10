@@ -106,9 +106,9 @@ const Contact: React.FC = () => {
                     <div>
                       <h3 className="mb-2 text-lg font-medium">Email</h3>
                       <p className="text-gray-600">
-                        General Inquiries: info@timesroman.com<br />
-                        News Tips: tips@timesroman.com<br />
-                        Advertising: ads@timesroman.com
+                        General Inquiries: info@timesroman.in<br />
+                        News Tips: tips@timesroman.in<br />
+                        Advertising: ads@timesroman.in
                       </p>
                     </div>
                   </div>
@@ -234,7 +234,7 @@ const Contact: React.FC = () => {
                 <div className="mt-8 rounded-lg bg-blue-50 p-6">
                   <h3 className="mb-2 text-lg font-medium text-blue-800">Press Inquiries</h3>
                   <p className="text-blue-700">
-                    For press-related inquiries, please contact our media relations team at press@timesroman.com or call +1 (555) 234-5678.
+                    For press-related inquiries, please contact our media relations team at press@timesroman.com or call +91 (218) 635-9265.
                   </p>
                 </div>
               </div>
