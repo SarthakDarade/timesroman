@@ -1,97 +1,27 @@
 
-import React, { useState } from 'react';
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { FcGoogle } from 'react-icons/fc';
-
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
-const loginSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
-
-const signupSchema = loginSchema.extend({
-  confirmPassword: z.string().min(6, { message: "Password must be at least 6 characters" }),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
-});
-
-type SignupFormValues = z.infer<typeof signupSchema>;
-
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const { signIn, signUp, loading, signInWithGoogle } = useAuth();
+  const { loading, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   
   // Get the page they were trying to visit
   const from = location.state?.from?.pathname || "/";
 
-  const loginForm = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
-
-  const signupForm = useForm<SignupFormValues>({
-    resolver: zodResolver(signupSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-      confirmPassword: "",
-    },
-  });
-
-  const onLoginSubmit = async (data: LoginFormValues) => {
-    try {
-      await signIn(data.email, data.password);
-      navigate(from, { replace: true });
-    } catch (error) {
-      console.error("Login error:", error);
-    }
-  };
-
-  const onSignupSubmit = async (data: SignupFormValues) => {
-    try {
-      await signUp(data.email, data.password);
-      // We don't redirect after signup as they need to confirm their email
-    } catch (error) {
-      console.error("Signup error:", error);
-    }
-  };
-
   const handleGoogleSignIn = async () => {
     try {
       await signInWithGoogle();
+      // Navigation is handled by the auth state change listener
     } catch (error) {
       console.error("Google sign in error:", error);
     }
-  };
-
-  const toggleForm = () => {
-    setIsLogin(!isLogin);
   };
 
   return (
@@ -99,143 +29,40 @@ const Auth = () => {
       <Navbar />
       
       <main className="flex-1">
-        <section className="container mx-auto max-w-md px-4 py-8">
-          <div className="mb-6 text-center">
+        <section className="container mx-auto max-w-md px-4 py-16">
+          <div className="mb-10 text-center">
             <h1 className="font-serif text-3xl font-bold">
-              {isLogin ? "Welcome Back" : "Create Account"}
+              Welcome to Times Roman
             </h1>
-            <p className="mt-2 text-gray-600">
-              {isLogin 
-                ? "Sign in to access your account" 
-                : "Join Times Roman to access exclusive content"
-              }
+            <p className="mt-3 text-gray-600">
+              Sign in to access personalized news content and features
             </p>
           </div>
           
           {/* Google Sign In Button */}
-          <Button 
-            variant="outline" 
-            className="w-full mb-4 flex items-center justify-center gap-2"
-            onClick={handleGoogleSignIn}
-            disabled={loading}
-          >
-            <FcGoogle className="h-5 w-5" />
-            {isLogin ? "Sign In with Google" : "Sign Up with Google"}
-          </Button>
-          
-          <div className="relative my-6">
-            <Separator />
-            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-2 text-xs text-gray-500">
-              OR
-            </span>
+          <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+            <h2 className="mb-6 text-center text-xl font-semibold">Sign in with Google</h2>
+            
+            <Button 
+              variant="outline" 
+              className="w-full flex items-center justify-center gap-2 py-6 text-base"
+              onClick={handleGoogleSignIn}
+              disabled={loading}
+            >
+              <FcGoogle className="h-6 w-6" />
+              {loading ? "Signing in..." : "Continue with Google"}
+            </Button>
+            
+            <p className="mt-6 text-center text-sm text-gray-600">
+              By continuing, you agree to our <a href="/terms" className="text-blue-600 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</a>.
+            </p>
           </div>
           
-          {isLogin ? (
-            <Form {...loginForm}>
-              <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
-                <FormField
-                  control={loginForm.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input placeholder="your.email@example.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={loginForm.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  disabled={loading}
-                >
-                  {loading ? "Signing in..." : "Sign In"}
-                </Button>
-              </form>
-            </Form>
-          ) : (
-            <Form {...signupForm}>
-              <form onSubmit={signupForm.handleSubmit(onSignupSubmit)} className="space-y-4">
-                <FormField
-                  control={signupForm.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input placeholder="your.email@example.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={signupForm.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={signupForm.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Confirm Password</FormLabel>
-                      <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  disabled={loading}
-                >
-                  {loading ? "Creating Account..." : "Create Account"}
-                </Button>
-              </form>
-            </Form>
-          )}
-          
-          <div className="mt-6 text-center">
-            <button 
-              onClick={toggleForm}
-              className="text-sm font-medium text-blue-600 hover:underline"
-            >
-              {isLogin 
-                ? "Don't have an account? Sign Up" 
-                : "Already have an account? Sign In"
-              }
-            </button>
+          <div className="mt-8 text-center text-sm text-gray-600">
+            <p>
+              Times Roman uses secure authentication powered by Google.
+              We never store your password.
+            </p>
           </div>
         </section>
       </main>
