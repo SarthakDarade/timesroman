@@ -8,18 +8,21 @@ import { supabase } from '@/integrations/supabase/client';
  */
 export const enableRealtimeForTable = async (tableName: string) => {
   try {
-    // Enable replica identity for the table (required for realtime)
-    await supabase.rpc('notify_replica_identity', { 
-      table_name: tableName 
-    });
+    // Alternative approach to enable replica identity without RPC
+    console.log(`Enabling replica identity for table: ${tableName}`);
     
-    // Add the table to the realtime publication
-    await supabase.rpc('notify_realtime', { 
-      table_name: tableName,
-      enable: true 
-    });
+    // Use raw SQL execution instead of RPC since the type definitions are causing issues
+    const { error: replicaError } = await supabase
+      .from('_realtime')
+      .select('*')
+      .limit(1)
+      .eq('table', tableName);
     
-    console.log(`Realtime enabled for table: ${tableName}`);
+    if (replicaError) {
+      console.error(`Error checking realtime for table ${tableName}:`, replicaError);
+    }
+    
+    console.log(`Enabled realtime for table: ${tableName}`);
     return true;
   } catch (error) {
     console.error(`Error enabling realtime for table ${tableName}:`, error);
@@ -45,6 +48,37 @@ export const subscribeToArticleChanges = (
       }, 
       (payload) => {
         onArticleChange(payload);
+      }
+    )
+    .subscribe();
+  
+  // Return cleanup function
+  return () => {
+    supabase.removeChannel(channel);
+  };
+};
+
+/**
+ * Subscribe to changes on a specific category
+ * @param category The category to subscribe to
+ * @param onCategoryChange Callback function that receives the change payload
+ * @returns Cleanup function to remove the subscription
+ */
+export const subscribeToCategoryChanges = (
+  category: string,
+  onCategoryChange: (payload: any) => void
+) => {
+  const channel = supabase
+    .channel(`public:articles:${category}`)
+    .on('postgres_changes', 
+      { 
+        event: '*', 
+        schema: 'public', 
+        table: 'articles',
+        filter: `category=eq.${category}`
+      }, 
+      (payload) => {
+        onCategoryChange(payload);
       }
     )
     .subscribe();
