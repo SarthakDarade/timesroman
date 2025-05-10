@@ -56,23 +56,20 @@ const SEOHead: React.FC<SEOHeadProps> = ({
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={enhancedDescription} />
       <meta name="twitter:image" content={ogImage} />
+      
       {/* Ensure preview works on WhatsApp */}
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
 
-      {/* Article Specific Meta Tags */}
-      {articleMeta && ogType === 'article' && (
-        <>
-          {articleMeta.publishedTime && (
-            <meta property="article:published_time" content={articleMeta.publishedTime} />
-          )}
-          {articleMeta.author && (
-            <meta property="article:author" content={articleMeta.author} />
-          )}
-          {articleMeta.category && (
-            <meta property="article:section" content={articleMeta.category} />
-          )}
-        </>
+      {/* Article Specific Meta Tags - Only render if ogType is article and articleMeta exists */}
+      {articleMeta && ogType === 'article' && articleMeta.publishedTime && (
+        <meta property="article:published_time" content={articleMeta.publishedTime} />
+      )}
+      {articleMeta && ogType === 'article' && articleMeta.author && (
+        <meta property="article:author" content={articleMeta.author} />
+      )}
+      {articleMeta && ogType === 'article' && articleMeta.category && (
+        <meta property="article:section" content={articleMeta.category} />
       )}
       
       {/* IndexNow API Key Tag */}
