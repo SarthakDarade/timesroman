@@ -112,16 +112,16 @@ const About: React.FC = () => {
                 <Card className="overflow-hidden">
                   <div className="aspect-[3/2] overflow-hidden">
                     <img 
-                      src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
-                      alt="James Wilson" 
+                      src="https://i.ibb.co/sdD46GSt/IMG-20240708-WA0002.jpg&auto=format&fit=crop&w=800&q=80" 
+                      alt="Sarthak Darade" 
                       className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
                     />
                   </div>
                   <CardContent className="p-6">
-                    <h3 className="mb-2 font-serif text-2xl font-medium">James Wilson</h3>
+                    <h3 className="mb-2 font-serif text-2xl font-medium">Sarthak Darade</h3>
                     <p className="mb-4 text-blue-600">Co-Founder & Editor-in-Chief</p>
                     <p className="text-gray-600">
-                      James has over 20 years of experience in journalism, previously serving as the senior editor at The Washington Post and The New York Times. He founded Times Roman to create a new standard for digital journalism.
+                      Is is a passionate software developer and visionary innovator behind Times Roman. With a strong foundation in technology and a deep interest in AI-powered automation, Sarthak founded Times Roman with the mission to revolutionize how news is curated, delivered, and consumed.
                     </p>
                   </CardContent>
                 </Card>
