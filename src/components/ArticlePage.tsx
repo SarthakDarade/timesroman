@@ -196,7 +196,7 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
       case 'entertainment': return 'bg-pink-600';
       case 'sports': return 'bg-orange-600';
       case 'politics': return 'bg-red-600';
-      case 'world-news': return 'bg-sky-600';
+      case 'world news': return 'bg-sky-600';
       case 'us-news': return 'from-red-600 to-orange-600';
       case 'india-news': return 'from-amber-600 to-orange-600';
       case 'sports-news': return 'from-green-600 to-emerald-600';
