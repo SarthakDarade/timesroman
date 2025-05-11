@@ -119,7 +119,7 @@ const About: React.FC = () => {
                   </div>
                   <CardContent className="p-6">
                     <h3 className="mb-2 font-serif text-2xl font-medium">Sarthak Darade</h3>
-                    <p className="mb-4 text-blue-600">Co-Founder & Editor-in-Chief</p>
+                    <p className="mb-4 text-blue-600">Founder & Editor-in-Chief</p>
                     <p className="text-gray-600">
                       Is is a passionate software developer and visionary innovator behind Times Roman. With a strong foundation in technology and a deep interest in AI-powered automation, Sarthak founded Times Roman with the mission to revolutionize how news is curated, delivered, and consumed.
                     </p>
