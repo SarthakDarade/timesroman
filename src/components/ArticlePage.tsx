@@ -214,7 +214,6 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
       case 'social': return 'bg-blue-400';             // Lively and digital
       case 'education': return 'bg-indigo-600';         // Academic tone
       case 'travel': return 'bg-teal-500';                   // Adventure feel
-      case 'india-news': return 'bg-orange-600';             // India's flag tone
       case 'space-expo': return 'bg-gray-800';        // Deep space feel
       case 'weather': return 'bg-sky-500';                   // Sky blue
       case 'gaming': return 'bg-pink-600';                   // Vibrant and fun
