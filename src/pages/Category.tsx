@@ -44,6 +44,25 @@ const categoryTitles: Record<string, string> = {
   "technology-news": "Technology News",
   "business-news": "Business News",
   lifestyle: "Lifestyle",
+  "crime-news": "Crime News",
+  "history": "History",
+  "culture": "Culture",
+  "social-media": "Social Media",
+  "education-news": "Education News",
+  "travel": "Travel",
+  "space-exploration": "Space Exploration",
+  "weather": "Weather",
+  "gaming": "Gaming",
+  "mumbai": "Mumbai",
+  "delhi": "Delhi",
+  "bangalore": "Bangalore",
+  "hyderabad": "Hyderabad",
+  "kolkata": "Kolkata",
+  "chennai": "Chennai",
+  "tv-news": "TV News",
+  "auto": "Auto",
+  "war-news": "War News",
+  "events": "Events"
 };
 
 const categoryDescriptions: Record<string, string> = {
@@ -65,6 +84,25 @@ const categoryDescriptions: Record<string, string> = {
   "technology-news": "The latest developments and breaking stories from the tech industry.",
   "business-news": "Recent financial updates, market movements, and business developments.",
   lifestyle: "Articles on wellness, fashion, food, travel, and personal development.",
+  "crime": "Stay alert with the latest crime reports, legal proceedings, and public safety updates from around the world.",
+  "history": "Delve into the past with stories, events, and figures that have shaped civilizations and modern society.",
+  "culture": "Explore diverse traditions, arts, beliefs, and social practices from communities around the globe.",
+  "social": "Catch up on trends, viral moments, and the evolving impact of social media on modern life.",
+  "education": "Get updates on educational reforms, academic insights, and learning trends affecting students and educators.",
+  "travel": "Discover travel guides, destination highlights, and tips for globetrotters and local explorers alike.",
+  "space-expo": "Uncover the mysteries of the universe with news on space missions, astronomy, and scientific discovery.",
+  "weather": "Track forecasts, extreme weather alerts, and climate patterns impacting regions across the globe.",
+  "gaming": "Stay plugged in with news, reviews, and updates from the world of video games and esports.",
+  "mumbai": "Get the latest news, developments, and local updates from the bustling city of Mumbai.",
+  "delhi": "Stay informed on politics, events, and happenings from the capital city of Delhi.",
+  "bangalore": "Follow tech news, city developments, and lifestyle stories from India’s Silicon Valley – Bangalore.",
+  "hyderabad": "Explore cultural, tech, and civic news from the historic and rapidly growing city of Hyderabad.",
+  "kolkata": "Catch the pulse of Kolkata through updates on its culture, politics, and urban evolution.",
+  "chennai": "Stay updated on news, events, and cultural highlights from the southern city of Chennai.",
+  "tv-news": "Tune into the latest updates, showbiz coverage, and stories from the world of television.",
+  "auto": "Get the latest on cars, bikes, electric vehicles, industry trends, and automotive innovations.",
+  "war-news": "Follow conflict zones, military developments, and geopolitical tensions around the world.",
+  "events": "Find coverage of major events, festivals, and happenings across various sectors and locations."
 };
 
 const Category = () => {
@@ -209,6 +247,25 @@ const Category = () => {
       case 'business-news': return 'from-teal-700 to-emerald-500';
       case 'entertainment-news': return 'from-rose-600 to-pink-400';
       case 'lifestyle': return 'from-violet-600 to-purple-400';
+      case 'crime-news': return 'from-red-700 to-rose-600';
+      case 'history': return 'from-yellow-800 to-amber-600';
+      case 'culture': return 'from-purple-700 to-pink-600';
+      case 'social-media': return 'from-blue-500 to-sky-400';
+      case 'education-news': return 'from-indigo-600 to-violet-500';
+      case 'travel': return 'from-teal-600 to-cyan-500';
+      case 'space-exploration': return 'from-gray-800 to-slate-700';
+      case 'weather': return 'from-sky-600 to-blue-400';
+      case 'gaming': return 'from-pink-600 to-fuchsia-500';
+      case 'mumbai': return 'from-rose-600 to-pink-500';
+      case 'delhi': return 'from-amber-700 to-orange-500';
+      case 'bangalore': return 'from-green-700 to-emerald-600';
+      case 'hyderabad': return 'from-fuchsia-600 to-pink-500';
+      case 'kolkata': return 'from-lime-700 to-green-500';
+      case 'chennai': return 'from-cyan-700 to-blue-500';
+      case 'tv-news': return 'from-blue-700 to-indigo-600';
+      case 'auto': return 'from-gray-700 to-zinc-600';
+      case 'war-news': return 'from-red-800 to-rose-700';
+      case 'events': return 'from-violet-500 to-purple-400';
       default: return 'from-gray-700 to-gray-900';
     }
   };
