@@ -28,7 +28,7 @@ const moreCategories = [
   { name: "Press Releases", path: "/category/press-releases" },
   { name: "Science", path: "/category/science" },
   { name: "Health", path: "/category/health" },
-  { name: "Entertainment", path: "/category/entertainment" },
+  { name: "US News", path: "/category/us-news" },
   { name: "Lifestyle", path: "/category/lifestyle" },
 ];
 
