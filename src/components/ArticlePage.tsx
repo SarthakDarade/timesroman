@@ -208,26 +208,26 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
       case 'business-news': return 'from-teal-700 to-emerald-500';
       case 'entertainment-news': return 'from-rose-600 to-pink-400';
       case 'lifestyle': return 'from-violet-600 to-purple-400';
-      case 'Crime News': return 'bg-red-700';                 // Red for danger
-      case 'History': return 'bg-yellow-800';                // Earthy tone
-      case 'Culture': return 'bg-purple-600';                // Rich, cultural color
-      case 'Social Media': return 'bg-blue-400';             // Lively and digital
-      case 'Education News': return 'bg-indigo-600';         // Academic tone
-      case 'Travel': return 'bg-teal-500';                   // Adventure feel
-      case 'India News': return 'bg-orange-600';             // India's flag tone
-      case 'Space Exploration': return 'bg-gray-800';        // Deep space feel
-      case 'Weather': return 'bg-sky-500';                   // Sky blue
-      case 'Gaming': return 'bg-pink-600';                   // Vibrant and fun
-      case 'Mumbai': return 'bg-rose-600';                   // Urban vibrant
-      case 'Delhi': return 'bg-amber-700';                   // Historic richness
-      case 'Bangalore': return 'bg-green-700';               // Garden city
-      case 'Hyderabad': return 'bg-fuchsia-600';             // Cultural vibrance
-      case 'Kolkata': return 'bg-lime-700';                  // Festive and colorful
-      case 'Chennai': return 'bg-cyan-700';                  // Coastal color
-      case 'TV News': return 'bg-blue-700';                  // Media-centric
-      case 'Auto': return 'bg-gray-700';                     // Industrial tone
-      case 'War News': return 'bg-red-900';                  // Intense conflict
-      case 'Events': return 'bg-violet-500';                 // Celebration and social
+      case 'crime': return 'bg-red-700';                 // Red for danger
+      case 'history': return 'bg-yellow-800';                // Earthy tone
+      case 'culture': return 'bg-purple-600';                // Rich, cultural color
+      case 'social': return 'bg-blue-400';             // Lively and digital
+      case 'education': return 'bg-indigo-600';         // Academic tone
+      case 'travel': return 'bg-teal-500';                   // Adventure feel
+      case 'india-news': return 'bg-orange-600';             // India's flag tone
+      case 'space-expo': return 'bg-gray-800';        // Deep space feel
+      case 'weather': return 'bg-sky-500';                   // Sky blue
+      case 'gaming': return 'bg-pink-600';                   // Vibrant and fun
+      case 'mumbai': return 'bg-rose-600';                   // Urban vibrant
+      case 'delhi': return 'bg-amber-700';                   // Historic richness
+      case 'bangalore': return 'bg-green-700';               // Garden city
+      case 'hyderabad': return 'bg-fuchsia-600';             // Cultural vibrance
+      case 'kolkata': return 'bg-lime-700';                  // Festive and colorful
+      case 'chennai': return 'bg-cyan-700';                  // Coastal color
+      case 'tv-news': return 'bg-blue-700';                  // Media-centric
+      case 'auto': return 'bg-gray-700';                     // Industrial tone
+      case 'war': return 'bg-red-900';                  // Intense conflict
+      case 'events': return 'bg-violet-500';                 // Celebration and social
       default: return 'bg-gray-600';
     }
   };
