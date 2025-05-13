@@ -53,6 +53,12 @@ const Auth = () => {
               {loading ? "Signing in..." : "Continue with Google"}
             </Button>
             
+            <br>
+            <p className="mt-6 text-center text-sm text-gray-600">
+              Apple Sign In Coming Soon
+            </p>
+            </br>
+            
             <p className="mt-6 text-center text-sm text-gray-600">
               By continuing, you agree to our <a href="/terms" className="text-blue-600 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</a>.
             </p>
