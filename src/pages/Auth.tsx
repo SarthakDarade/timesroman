@@ -194,7 +194,7 @@ const Auth = () => {
               variants={itemVariants}
             >
               <p>
-                Times Roman uses secure authentication powered by Supabase.
+                Times Roman uses secure authentication powered by us.
                 We never store your password.
               </p>
               <p className="mt-4">
