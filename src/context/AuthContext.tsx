@@ -12,6 +12,9 @@ type AuthContextType = {
   signOut: () => Promise<void>;
   refreshSession: () => Promise<void>;
   signInWithGoogle: () => Promise<void>;
+  signInWithFacebook: () => Promise<void>;
+  signInWithTwitter: () => Promise<void>;
+  signInWithLinkedIn: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -83,6 +86,63 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
     }
   };
+  
+  const signInWithFacebook = async () => {
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'facebook',
+        options: {
+          redirectTo: window.location.origin + '/auth/callback',
+        }
+      });
+      
+      if (error) throw error;
+    } catch (error: any) {
+      toast.error(error.message || 'Error signing in with Facebook');
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const signInWithTwitter = async () => {
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'twitter',
+        options: {
+          redirectTo: window.location.origin + '/auth/callback',
+        }
+      });
+      
+      if (error) throw error;
+    } catch (error: any) {
+      toast.error(error.message || 'Error signing in with X (Twitter)');
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const signInWithLinkedIn = async () => {
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'linkedin_oidc', // Using the OIDC provider for LinkedIn
+        options: {
+          redirectTo: window.location.origin + '/auth/callback',
+        }
+      });
+      
+      if (error) throw error;
+    } catch (error: any) {
+      toast.error(error.message || 'Error signing in with LinkedIn');
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const signOut = async () => {
     try {
@@ -103,7 +163,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       loading, 
       signOut,
       refreshSession,
-      signInWithGoogle 
+      signInWithGoogle,
+      signInWithFacebook,
+      signInWithTwitter,
+      signInWithLinkedIn
     }}>
       {children}
     </AuthContext.Provider>

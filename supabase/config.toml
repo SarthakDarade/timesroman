@@ -1,1 +1,13 @@
+
 project_id = "jdencffimqusolxqbnjw"
+
+[auth]
+additional_user_fields = [
+  { name = "full_name", type = "text" },
+  { name = "bio", type = "text" },
+  { name = "website", type = "text" },
+  { name = "location", type = "text" },
+  { name = "phone", type = "text" },
+  { name = "birthday", type = "date" },
+  { name = "occupation", type = "text" }
+]
