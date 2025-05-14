@@ -20,3 +20,21 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     storage: localStorage
   }
 });
+
+// Helper function for social sign in
+export const signInWithSocial = async (provider: 'google' | 'facebook' | 'twitter' | 'linkedin') => {
+  try {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: provider,
+      options: {
+        redirectTo: window.location.origin + '/auth/callback',
+      },
+    });
+
+    if (error) throw error;
+    return { data, error: null };
+  } catch (error) {
+    console.error('Error signing in with social provider:', error);
+    return { data: null, error };
+  }
+};
