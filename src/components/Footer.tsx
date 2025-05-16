@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Twitter, Facebook, Instagram, Github } from 'lucide-react';
+import { Twitter, Facebook, Instagram, Github, Linkedin, MessageCircleCode } from 'lucide-react';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -19,17 +19,17 @@ const Footer: React.FC = () => {
               Next-generation AI-powered news platform delivering fresh, unbiased perspectives.
             </p>
             <div className="mt-4 flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white">
+              <a href="https://x.com/timesroman_in" className="text-gray-400 hover:text-white">
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white">
-                <Facebook className="h-5 w-5" />
+              <a href="https://www.linkedin.com/company/times-roman/" className="text-gray-400 hover:text-white">
+                <Linkedin className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white">
+              <a href="https://www.instagram.com/timesroman.in/" className="text-gray-400 hover:text-white">
                 <Instagram className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white">
-                <Github className="h-5 w-5" />
+              <a href="https://whatsapp.com/channel/0029VbApDCe6GcG9wAYtkN0p" className="text-gray-400 hover:text-white">
+                <MessageCircleCode className="h-5 w-5" />
               </a>
             </div>
           </div>
