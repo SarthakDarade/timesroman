@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Twitter, Facebook, Instagram, Github, Linkedin, MessageCircleCode } from 'lucide-react';
+import { FaWhatsapp, FaXTwitter } from 'react-icons/fa6';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -20,7 +21,7 @@ const Footer: React.FC = () => {
             </p>
             <div className="mt-4 flex space-x-4">
               <a href="https://x.com/timesroman_in" className="text-gray-400 hover:text-white">
-                <Twitter className="h-5 w-5" />
+                <FaXTwitter className="h-5 w-5" />
               </a>
               <a href="https://www.linkedin.com/company/times-roman/" className="text-gray-400 hover:text-white">
                 <Linkedin className="h-5 w-5" />
@@ -29,7 +30,7 @@ const Footer: React.FC = () => {
                 <Instagram className="h-5 w-5" />
               </a>
               <a href="https://whatsapp.com/channel/0029VbApDCe6GcG9wAYtkN0p" className="text-gray-400 hover:text-white">
-                <MessageCircleCode className="h-5 w-5" />
+                <FaWhatsapp className="h-5 w-5" />
               </a>
             </div>
           </div>
