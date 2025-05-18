@@ -42,7 +42,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
       case 'us-news': return 'category-us-news';
       case 'india-news': return 'category-india-news';
       case 'sports-news': return 'category-sports-news';
-      case 'cricket': return 'category-cricket' 'bg-green-600';
+      case 'cricket': return 'bg-green-600';
       case 'government-news': return 'category-government-news';
       case 'press-releases': return 'category-press-releases';
       case 'latest-news': return 'category-latest-news';
