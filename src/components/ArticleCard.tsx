@@ -31,44 +31,43 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
   // Map category to color class
   const getCategoryClass = () => {
     switch (category.toLowerCase()) {
-      case 'technology': return 'category-technology';
-      case 'business': return 'category-business';
-      case 'health': return 'category-health';
-      case 'entertainment': return 'category-entertainment';
-      case 'sports': return 'category-sports';
-      case 'politics': return 'category-politics';
-      case 'science': return 'category-science';
-      case 'world news': return 'category-world-news';
-      case 'us-news': return 'category-us-news';
-      case 'india-news': return 'category-india-news';
-      case 'sports-news': return 'category-sports-news';
+      case 'technology': return 'bg-blue-600';
+      case 'business': return 'bg-green-600';
+      case 'health': return 'bg-purple-600';
+      case 'entertainment': return 'bg-pink-600';
+      case 'sports': return 'bg-orange-600';
+      case 'politics': return 'bg-red-600';
+      case 'world news': return 'bg-sky-600';
+      case 'us-news': return 'bg-red-600';
+      case 'india-news': return 'bg-amber-600';
+      case 'sports-news': return 'bg-green-6000';
       case 'cricket': return 'bg-green-600';
-      case 'government-news': return 'category-government-news';
-      case 'press-releases': return 'category-press-releases';
-      case 'latest-news': return 'category-latest-news';
-      case 'technology-news': return 'category-technology-news';
-      case 'business-news': return 'category-business-news';
-      case 'entertainment-news': return 'category-entertainment-news';
-      case 'lifestyle': return 'category-lifestyle';
-      case 'crime': return 'category-crime';
-      case 'history': return 'category-history';
-      case 'culture': return 'category-culture';
-      case 'social': return 'category-social';
-      case 'education': return 'category-education';
-      case 'travel': return 'category-travel';
-      case 'space-expo': return 'category-space-expo';
-      case 'weather': return 'category-weather';
-      case 'gaming': return 'category-gaming';
-      case 'mumbai': return 'category-mumbai';
-      case 'delhi': return 'category-delhi';
-      case 'bangalore': return 'category-bangalore';
-      case 'hyderabad': return 'category-hyderabad';
-      case 'kolkata': return 'category-kolkata';
-      case 'chennai': return 'category-chennai';
-      case 'tv-news': return 'category-tv-news';
-      case 'auto': return 'category-auto';
-      case 'war': return 'category-war';
-      case 'events': return 'category-events';
+      case 'government-news': return 'bg-slate-600';
+      case 'press-releases': return 'bg-gray-600';
+      case 'latest-news': return 'bg-blue-700';
+      case 'technology-news': return 'bg-indigo-700';
+      case 'business-news': return 'bg-teal-700';
+      case 'entertainment-news': return 'bg-rose-600';
+      case 'lifestyle': return 'bg-purple-400';
+      case 'crime': return 'bg-red-700';                 // Red for danger
+      case 'history': return 'bg-yellow-800';                // Earthy tone
+      case 'culture': return 'bg-purple-600';                // Rich, cultural color
+      case 'social': return 'bg-blue-400';             // Lively and digital
+      case 'education': return 'bg-indigo-600';         // Academic tone
+      case 'travel': return 'bg-teal-500';                   // Adventure feel
+      case 'space-expo': return 'bg-gray-800';        // Deep space feel
+      case 'weather': return 'bg-sky-500';                   // Sky blue
+      case 'gaming': return 'bg-pink-600';                   // Vibrant and fun
+      case 'mumbai': return 'bg-rose-600';                   // Urban vibrant
+      case 'delhi': return 'bg-amber-700';                   // Historic richness
+      case 'bangalore': return 'bg-green-700';               // Garden city
+      case 'hyderabad': return 'bg-fuchsia-600';             // Cultural vibrance
+      case 'kolkata': return 'bg-lime-700';                  // Festive and colorful
+      case 'chennai': return 'bg-cyan-700';                  // Coastal color
+      case 'tv-news': return 'bg-blue-700';                  // Media-centric
+      case 'auto': return 'bg-gray-700';                     // Industrial tone
+      case 'war': return 'bg-red-900';                  // Intense conflict
+      case 'events': return 'bg-violet-500';                 // Celebration and social
       default: return 'bg-blue-600';
     }
   };
