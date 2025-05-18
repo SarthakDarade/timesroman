@@ -50,7 +50,7 @@ const categoryTitles: Record<string, string> = {
   "social-media": "Social Media",
   "education-news": "Education News",
   "travel": "Travel",
-  "space-exploration": "Space Exploration",
+  "space-expo": "Space Exploration",
   "weather": "Weather",
   "gaming": "Gaming",
   "mumbai": "Mumbai",
