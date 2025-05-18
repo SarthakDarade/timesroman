@@ -31,13 +31,44 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
   // Map category to color class
   const getCategoryClass = () => {
     switch (category.toLowerCase()) {
-      case 'technology': return 'category-tech';
+      case 'technology': return 'category-technology';
       case 'business': return 'category-business';
       case 'health': return 'category-health';
       case 'entertainment': return 'category-entertainment';
       case 'sports': return 'category-sports';
-      case 'politics': return 'bg-red-600';
-      case 'science': return 'bg-cyan-600';
+      case 'politics': return 'category-politics';
+      case 'science': return 'category-science';
+      case 'world news': return 'category-world-news';
+      case 'us-news': return 'category-us-news';
+      case 'india-news': return 'category-india-news';
+      case 'sports-news': return 'category-sports-news';
+      case 'cricket': return 'category-cricket';
+      case 'government-news': return 'category-government-news';
+      case 'press-releases': return 'category-press-releases';
+      case 'latest-news': return 'category-latest-news';
+      case 'technology-news': return 'category-technology-news';
+      case 'business-news': return 'category-business-news';
+      case 'entertainment-news': return 'category-entertainment-news';
+      case 'lifestyle': return 'category-lifestyle';
+      case 'crime': return 'category-crime';
+      case 'history': return 'category-history';
+      case 'culture': return 'category-culture';
+      case 'social': return 'category-social';
+      case 'education': return 'category-education';
+      case 'travel': return 'category-travel';
+      case 'space-expo': return 'category-space-expo';
+      case 'weather': return 'category-weather';
+      case 'gaming': return 'category-gaming';
+      case 'mumbai': return 'category-mumbai';
+      case 'delhi': return 'category-delhi';
+      case 'bangalore': return 'category-bangalore';
+      case 'hyderabad': return 'category-hyderabad';
+      case 'kolkata': return 'category-kolkata';
+      case 'chennai': return 'category-chennai';
+      case 'tv-news': return 'category-tv-news';
+      case 'auto': return 'category-auto';
+      case 'war': return 'category-war';
+      case 'events': return 'category-events';
       default: return 'bg-blue-600';
     }
   };
