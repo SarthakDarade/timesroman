@@ -197,17 +197,17 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
       case 'sports': return 'bg-orange-600';
       case 'politics': return 'bg-red-600';
       case 'world news': return 'bg-sky-600';
-      case 'us-news': return 'from-red-600 to-orange-600';
-      case 'india-news': return 'from-amber-600 to-orange-600';
-      case 'sports-news': return 'from-green-600 to-emerald-600';
-      case 'cricket': return 'from-green-600 to-teal-600';
-      case 'government-news': return 'from-slate-600 to-gray-600';
-      case 'press-releases': return 'from-gray-600 to-slate-600';
-      case 'latest-news': return 'from-blue-700 to-blue-500';
-      case 'technology-news': return 'from-indigo-700 to-purple-500';
-      case 'business-news': return 'from-teal-700 to-emerald-500';
-      case 'entertainment-news': return 'from-rose-600 to-pink-400';
-      case 'lifestyle': return 'from-violet-600 to-purple-400';
+      case 'us-news': return 'bg-red-600';
+      case 'india-news': return 'bg-amber-600';
+      case 'sports-news': return 'bg-green-6000';
+      case 'cricket': return 'bg-green-600';
+      case 'government-news': return 'bg-slate-600';
+      case 'press-releases': return 'bg-gray-600';
+      case 'latest-news': return 'bg-blue-700';
+      case 'technology-news': return 'bg-indigo-700';
+      case 'business-news': return 'bg-teal-700';
+      case 'entertainment-news': return 'bg-rose-600';
+      case 'lifestyle': return 'bg-purple-400';
       case 'crime': return 'bg-red-700';                 // Red for danger
       case 'history': return 'bg-yellow-800';                // Earthy tone
       case 'culture': return 'bg-purple-600';                // Rich, cultural color
