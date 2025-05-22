@@ -1,0 +1,36 @@
+
+{
+  "name": "Times Roman News",
+  "short_name": "Times Roman",
+  "description": "Breaking News in India: Read Latest News on Sports, Business, Entertainment, World News and Political News.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "icons": [
+    {
+      "src": "https://i.ibb.co/Z6ffRH7K/Timesromancir-logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://i.ibb.co/Z6ffRH7K/Timesromancir-logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://i.ibb.co/Z6ffRH7K/Timesromancir-logo.png",
+      "type": "image/png",
+      "sizes": "720x1600",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "https://i.ibb.co/Z6ffRH7K/Timesromancir-logo.png",
+      "type": "image/png",
+      "sizes": "1600x900",
+      "form_factor": "wide"
+    }
+  ]
+}
