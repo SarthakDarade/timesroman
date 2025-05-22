@@ -95,6 +95,20 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
       const contentImages = contentRef.current.querySelectorAll('img');
       contentImages.forEach(img => {
         img.setAttribute('loading', 'lazy');
+        // Use srcset for responsive images
+        if (!img.hasAttribute('srcset') && img.hasAttribute('src')) {
+          const src = img.getAttribute('src') || '';
+          if (src.includes('unsplash.com')) {
+            // For Unsplash images, we can use their API to get different sizes
+            img.setAttribute('srcset', `
+              ${src}&w=400 400w,
+              ${src}&w=800 800w,
+              ${src}&w=1200 1200w
+            `);
+            img.setAttribute('sizes', '(max-width: 768px) 100vw, 800px');
+          }
+        }
+        
         if (!img.getAttribute('alt')) {
           img.setAttribute('alt', `Image related to ${title}`);
         }
@@ -106,7 +120,29 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
         if (!link.textContent?.trim()) {
           link.setAttribute('aria-label', 'Related article link');
         }
+        // Add proper title attributes to improve accessibility
+        if (!link.getAttribute('title')) {
+          link.setAttribute('title', link.textContent || 'Related content');
+        }
       });
+      
+      // Improve semantic HTML by wrapping paragraphs in <p> tags if not already
+      const contentHtml = contentRef.current.innerHTML;
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = contentHtml;
+      
+      // Add appropriate heading levels
+      const headings = tempDiv.querySelectorAll('h1, h2, h3, h4, h5, h6');
+      headings.forEach(heading => {
+        // Ensure heading hierarchy - article title is h1, so content should start with h2
+        if (heading.tagName === 'H1') {
+          const h2 = document.createElement('h2');
+          h2.innerHTML = heading.innerHTML;
+          heading.parentNode?.replaceChild(h2, heading);
+        }
+      });
+      
+      contentRef.current.innerHTML = tempDiv.innerHTML;
     }
   }, [content, title]);
 
@@ -189,6 +225,7 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
 
   // Get category class
   const getCategoryClass = () => {
+    // ... keep existing code (category color mapping)
     switch (category.toLowerCase()) {
       case 'technology': return 'bg-blue-600';
       case 'business': return 'bg-green-600';
@@ -289,7 +326,8 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
             aria-label="Share article"
           >
             <Share2 className="mr-2 h-4 w-4" aria-hidden="true" />
-            Share
+            <span>Share</span>
+            <span className="sr-only">Share this article</span>
           </button>
           <button 
             onClick={handleBookmark}
@@ -298,6 +336,7 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
           >
             <Bookmark className={`mr-2 h-4 w-4 ${isBookmarked ? 'fill-blue-500' : ''}`} aria-hidden="true" />
             {isBookmarked ? 'Saved' : 'Save'}
+            <span className="sr-only">{isBookmarked ? "Remove this article from bookmarks" : "Save this article"}</span>
           </button>
           <button 
             onClick={handleLike}
@@ -307,12 +346,13 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
             <ThumbsUp className={`mr-2 h-4 w-4 ${isLiked ? 'fill-red-500' : ''}`} aria-hidden="true" />
             <span className="mr-1">{isLiked ? 'Liked' : 'Like'}</span>
             <span className="rounded-full bg-gray-200 px-2 py-px text-xs">{likeCount}</span>
+            <span className="sr-only">{isLiked ? "Remove like from this article" : "Like this article"}</span>
           </button>
         </div>
       </header>
 
-      {/* Featured Image */}
-      <div className="my-8 animate-[fadeIn_1.3s_ease-in-out]">
+      {/* Featured Image with responsive srcset */}
+      <figure className="my-8 animate-[fadeIn_1.3s_ease-in-out]">
         <div className="mx-auto max-w-4xl overflow-hidden rounded-lg shadow-lg">
           <img 
             src={imageUrl} 
@@ -321,9 +361,16 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
             width="1200"
             height="630"
             loading="eager"
+            srcSet={`${imageUrl} 1200w, 
+                    ${imageUrl.replace(/(\?.*)?$/, '?w=800')} 800w, 
+                    ${imageUrl.replace(/(\?.*)?$/, '?w=400')} 400w`}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 800px, 1200px"
           />
         </div>
-      </div>
+        <figcaption className="mt-2 text-center text-sm text-gray-500">
+          {title} - Times Roman
+        </figcaption>
+      </figure>
 
       {/* Article Content */}
       <div className="mx-auto max-w-3xl">
@@ -336,7 +383,7 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
         {/* Author Bio Card */}
         <Card className="mt-12 animate-[fadeIn_1.6s_ease-in-out]">
           <CardHeader className="pb-2">
-            <h3 className="text-lg font-bold">About the Author</h3>
+            <h2 className="text-lg font-bold">About the Author</h2>
           </CardHeader>
           <CardContent>
             <div className="flex items-start space-x-4">
@@ -347,11 +394,13 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
                     alt={`Photo of ${author}`} 
                     className="rounded-full"
                     loading="lazy"
+                    width="48"
+                    height="48"
                   />
                 </Avatar>
               )}
               <div>
-                <h4 className="text-base font-semibold">{author}</h4>
+                <h3 className="text-base font-semibold">{author}</h3>
                 <p className="text-sm text-gray-600">{authorBio || `${author} is a contributor at Times Roman.`}</p>
               </div>
             </div>
@@ -363,18 +412,21 @@ const ArticlePage: React.FC<ArticlePageProps> = ({
           <Link 
             to="/search?q=news" 
             className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-800 hover:bg-gray-200 transition-all duration-200 hover:scale-105"
+            aria-label="Search for news"
           >
             #News
           </Link>
           <Link 
             to={`/category/${category.toLowerCase()}`}
             className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-800 hover:bg-gray-200 transition-all duration-200 hover:scale-105"
+            aria-label={`Browse ${category} category`}
           >
             #{category}
           </Link>
           <Link 
             to="/" 
             className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-800 hover:bg-gray-200 transition-all duration-200 hover:scale-105"
+            aria-label="Go to homepage"
           >
             #TimesRoman
           </Link>

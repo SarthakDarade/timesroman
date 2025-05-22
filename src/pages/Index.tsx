@@ -118,9 +118,6 @@ const Index = () => {
   };
 
   useEffect(() => {
-    // Set page title
-    document.title = 'Times Roman | Latest News and Articles';
-    
     // Initial fetch
     fetchArticles();
     
@@ -147,12 +144,21 @@ const Index = () => {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <SEOHead />
+      <SEOHead 
+        title="Times Roman News - Latest Breaking News, Headlines & Updates"
+        description="Stay informed with Times Roman: Read the latest news on politics, business, technology, entertainment, sports, world events and more. Breaking news updates, analysis and opinion."
+        isArticle={false}
+        publisherInfo={{
+          name: 'Times Roman',
+          logo: 'https://i.ibb.co/Z6ffRH7K/Timesromancir-logo.png'
+        }}
+      />
       <Navbar />
       
       <main className="flex-1">
         {/* Hero Section with Featured Article */}
         <section className="container mx-auto px-4 py-6 md:py-8">
+          <h1 className="sr-only">Times Roman News - Latest Headlines and Breaking News</h1>
           {loading ? (
             <div className="aspect-[16/9] w-full animate-pulse bg-gray-200 rounded-lg"></div>
           ) : (
@@ -164,7 +170,7 @@ const Index = () => {
         <div className="bg-gray-100 py-4 text-center">
           <div className="container mx-auto px-4">
             <div className="rounded-lg border border-dashed border-gray-300 bg-white p-2 shadow-sm">
-              <p className="text-sm text-gray-400">Advertisement</p>
+              <p className="text-sm text-gray-500">Advertisement</p>
               <div className="mx-auto h-[90px] w-full max-w-[728px] bg-gray-200 flex items-center justify-center">
                 <span className="text-gray-500">Ad Slot - 728x90</span>
               </div>
@@ -217,7 +223,7 @@ const Index = () => {
                 <div className="bg-white py-6 text-center">
                   <div className="container mx-auto px-4">
                     <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-2 shadow-sm">
-                      <p className="text-sm text-gray-400">Advertisement</p>
+                      <p className="text-sm text-gray-500">Advertisement</p>
                       <div className="mx-auto h-[250px] max-w-full bg-gray-200 flex items-center justify-center">
                         <span className="text-gray-500">{isMobile ? 'Mobile Ad - 300x250' : 'Desktop Ad - 970x250'}</span>
                       </div>

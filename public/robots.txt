@@ -2,8 +2,9 @@
 User-agent: *
 Allow: /
 
-# Sitemap location
+# Sitemaps
 Sitemap: https://timesroman.in/sitemap.xml
+Sitemap: https://timesroman.in/article.xml
 
 # Allow major search engines
 User-agent: Googlebot
@@ -13,6 +14,9 @@ User-agent: Bingbot
 Allow: /
 
 User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Googlebot-News
 Allow: /
 
 # Allow social media crawlers
@@ -31,3 +35,9 @@ Disallow: /auth/callback
 
 # Add a crawl delay to prevent server overload
 Crawl-delay: 1
+
+# News-specific rules
+User-agent: Googlebot-News
+Allow: /article/
+Disallow: /auth/
+Disallow: /profile/

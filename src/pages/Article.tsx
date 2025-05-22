@@ -23,6 +23,8 @@ interface Article {
   readTime?: string;
   views?: number;
   likes?: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
 const Article = () => {
@@ -78,6 +80,8 @@ const Article = () => {
           readTime: articleData.read_time || '3 min',
           views: articleData.views || 0,
           likes: articleData.likes || 0,
+          created_at: articleData.created_at,
+          updated_at: articleData.updated_at
         };
         
         setArticle(formattedArticle);
@@ -170,7 +174,10 @@ const Article = () => {
   if (!article) {
     return (
       <div className="flex min-h-screen flex-col">
-        <SEOHead title="Article Not Found | Times Roman" description="The article you're looking for doesn't exist or has been removed." />
+        <SEOHead 
+          title="Article Not Found | Times Roman" 
+          description="The article you're looking for doesn't exist or has been removed." 
+        />
         <Navbar />
         <main className="container mx-auto flex-1 px-4 py-8">
           <div className="flex flex-col items-center justify-center py-12">
@@ -205,14 +212,10 @@ const Article = () => {
     readTime: article.readTime || '3 min',
     views: article.views || 0,
     likes: article.likes || 0,
+    created_at: article.created_at || new Date().toISOString(),
+    updated_at: article.updated_at || new Date().toISOString()
   };
 
-  // Create ISO date format for SEO
-  const publishDate = new Date(article.date);
-  const isoDate = !isNaN(publishDate.getTime()) ? 
-    publishDate.toISOString() : 
-    new Date().toISOString();
-    
   // Generate article excerpt for social sharing
   const getArticleDescription = () => {
     if (article.excerpt && article.excerpt.trim().length > 0) {
@@ -234,6 +237,16 @@ const Article = () => {
 
   // Get the article description for sharing
   const articleDescription = getArticleDescription();
+  
+  // Strip HTML tags for article body in structured data
+  const stripHtml = (html) => {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    return tempDiv.textContent || tempDiv.innerText || '';
+  };
+
+  // For JSON-LD structured data
+  const articleContent = stripHtml(article.content);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -243,23 +256,32 @@ const Article = () => {
         ogImage={article.imageUrl}
         ogType="article"
         canonical={currentUrl}
+        isArticle={true}
         articleMeta={{
-          publishedTime: isoDate,
+          publishedTime: standardizedArticle.created_at,
+          modifiedTime: standardizedArticle.updated_at,
           author: article.author,
-          category: article.category
+          category: article.category,
+          content: articleContent
+        }}
+        publisherInfo={{
+          name: 'Times Roman',
+          logo: 'https://i.ibb.co/Z6ffRH7K/Timesromancir-logo.png'
         }}
       />
       <ReadingProgressBar />
       <Navbar />
       
       <main className="flex-1">
-        <ArticlePage {...standardizedArticle} />
+        <article className="article-container">
+          <ArticlePage {...standardizedArticle} />
+        </article>
         
         {/* Ad slot between article and related content */}
         <div className="bg-gray-100 py-6 text-center">
           <div className="container mx-auto px-4">
             <div className="rounded-lg border border-dashed border-gray-300 bg-white p-4 shadow-sm">
-              <p className="text-gray-400">Advertisement</p>
+              <p className="text-gray-500">Advertisement</p>
               <div className="mx-auto h-[250px] max-w-[300px] bg-gray-200 flex items-center justify-center">
                 <span className="text-gray-500">Ad Slot - 300x250</span>
               </div>
@@ -282,7 +304,7 @@ const Article = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500">No related articles found.</p>
+              <p className="text-gray-600">No related articles found.</p>
             )}
           </div>
         </section>
