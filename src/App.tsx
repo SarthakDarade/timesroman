@@ -1,4 +1,3 @@
-
 import React, { Suspense, lazy, useEffect } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -73,9 +72,11 @@ const AppContent = () => {
         links.forEach(link => {
           const href = link.getAttribute('href');
           if (href && href.startsWith('/article/')) {
-            Article.preload();
+            // Preload the Article component when idle (no need to call .preload())
+            import("./pages/Article");
           } else if (href && href.startsWith('/category/')) {
-            Category.preload();
+            // Preload the Category component when idle (no need to call .preload())
+            import("./pages/Category");
           }
         });
         prefetchRouteData();
