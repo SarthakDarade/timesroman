@@ -1,3 +1,4 @@
+
 import React, { Suspense, lazy, useEffect } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -21,6 +22,7 @@ const About = lazy(() => import("./pages/About"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const Terms = lazy(() => import("./pages/Terms"));
+const Disclaimer = lazy(() => import("./pages/Disclaimer"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Fallback loading component
@@ -57,6 +59,86 @@ const AuthCallback = () => {
   );
 };
 
+// RSS Feed endpoint component
+const RSSFeed = () => {
+  useEffect(() => {
+    const generateRSS = async () => {
+      try {
+        // Import the RSS generation function
+        const { generateRssFeed } = await import('./api/rss');
+        const rssContent = await generateRssFeed();
+        
+        // Set the content type and send the RSS
+        const blob = new Blob([rssContent], { type: 'application/rss+xml' });
+        const url = URL.createObjectURL(blob);
+        
+        // Create a temporary link to download the RSS
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'rss.xml';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        // Navigate back to home
+        window.location.href = '/';
+      } catch (error) {
+        console.error('Error generating RSS:', error);
+        window.location.href = '/';
+      }
+    };
+    
+    generateRSS();
+  }, []);
+
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <p>Generating RSS feed...</p>
+    </div>
+  );
+};
+
+// Sitemap endpoint component
+const SitemapXML = () => {
+  useEffect(() => {
+    const generateSitemap = async () => {
+      try {
+        // Import the sitemap generation function
+        const { generateArticleXml } = await import('./api/rss');
+        const sitemapContent = await generateArticleXml();
+        
+        // Set the content type and send the sitemap
+        const blob = new Blob([sitemapContent], { type: 'application/xml' });
+        const url = URL.createObjectURL(blob);
+        
+        // Create a temporary link to download the sitemap
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'sitemap.xml';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        // Navigate back to home
+        window.location.href = '/';
+      } catch (error) {
+        console.error('Error generating sitemap:', error);
+        window.location.href = '/';
+      }
+    };
+    
+    generateSitemap();
+  }, []);
+
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <p>Generating sitemap...</p>
+    </div>
+  );
+};
+
 // Prefetch function to be used with React Query
 const prefetchRouteData = () => {
   // This function would prefetch data for routes the user is likely to visit
@@ -72,10 +154,10 @@ const AppContent = () => {
         links.forEach(link => {
           const href = link.getAttribute('href');
           if (href && href.startsWith('/article/')) {
-            // Preload the Article component when idle (no need to call .preload())
+            // Preload the Article component when idle
             import("./pages/Article");
           } else if (href && href.startsWith('/category/')) {
-            // Preload the Category component when idle (no need to call .preload())
+            // Preload the Category component when idle
             import("./pages/Category");
           }
         });
@@ -155,6 +237,16 @@ const AppContent = () => {
               </Suspense>
             } 
           />
+          <Route 
+            path="/disclaimer" 
+            element={
+              <Suspense fallback={<PageLoadingFallback />}>
+                <Disclaimer />
+              </Suspense>
+            } 
+          />
+          <Route path="/rss.xml" element={<RSSFeed />} />
+          <Route path="/sitemap.xml" element={<SitemapXML />} />
           <Route 
             path="/profile" 
             element={
