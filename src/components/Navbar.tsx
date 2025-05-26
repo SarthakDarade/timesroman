@@ -54,7 +54,7 @@ const moreCategories = [
     { name: "Chennai", path: "/category/chennai" },
     { name: "TV News", path: "/category/tv-news" },
     { name: "Auto", path: "/category/auto" },
-    { name: "War News", path: "/category/war" },
+    { name: "War News", path: "/category/war-news" },
   ]
 ];
 
