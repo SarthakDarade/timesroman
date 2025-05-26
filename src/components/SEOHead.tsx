@@ -54,13 +54,14 @@ const SEOHead: React.FC<SEOHeadProps> = ({
     ? `${description} Stay informed with Times Roman's comprehensive news coverage.` 
     : description;
 
-  // Safe string conversion function
+  // Safe string conversion function to prevent Symbol errors
   const safeString = (value: any): string => {
     if (value === null || value === undefined) return '';
     if (typeof value === 'string') return value;
     if (typeof value === 'number') return value.toString();
     if (typeof value === 'boolean') return value.toString();
-    // Handle symbols and other non-serializable values
+    // Handle symbols and other non-serializable values safely
+    if (typeof value === 'symbol') return '';
     try {
       return String(value);
     } catch {
@@ -68,8 +69,20 @@ const SEOHead: React.FC<SEOHeadProps> = ({
     }
   };
 
+  // Create safe structured data objects
+  const createSafeStructuredData = (data: any) => {
+    const cleanData = JSON.parse(JSON.stringify(data, (key, value) => {
+      // Replace any problematic values with safe strings
+      if (typeof value === 'symbol' || typeof value === 'function') {
+        return '';
+      }
+      return safeString(value);
+    }));
+    return JSON.stringify(cleanData);
+  };
+
   // Create structured data for website
-  const websiteStructuredData = JSON.stringify({
+  const websiteData = {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": safeString(siteName),
@@ -96,10 +109,10 @@ const SEOHead: React.FC<SEOHeadProps> = ({
         "height": 60
       }
     }
-  });
+  };
 
   // Create structured data for organization
-  const organizationStructuredData = JSON.stringify({
+  const organizationData = {
     "@context": "https://schema.org",
     "@type": "NewsMediaOrganization",
     "name": safeString(publisherInfo.name),
@@ -130,12 +143,12 @@ const SEOHead: React.FC<SEOHeadProps> = ({
       "@type": "PostalAddress",
       "addressCountry": "IN"
     }
-  });
+  };
 
   // Create article structured data if this is an article
-  let articleStructuredData = '';
+  let articleData = null;
   if (isArticle && articleMeta) {
-    articleStructuredData = JSON.stringify({
+    articleData = {
       "@context": "https://schema.org",
       "@type": "NewsArticle",
       "headline": safeString(title),
@@ -184,7 +197,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({
       "copyrightYear": new Date().getFullYear(),
       "isAccessibleForFree": true,
       "genre": "news"
-    });
+    };
   }
 
   return (
@@ -253,10 +266,10 @@ const SEOHead: React.FC<SEOHeadProps> = ({
       <link rel="alternate" type="application/rss+xml" title={`${siteName} RSS Feed`} href={`${baseUrl}/rss.xml`} />
       
       {/* JSON-LD structured data - using safe string conversion */}
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: websiteStructuredData }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: organizationStructuredData }} />
-      {articleStructuredData && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: articleStructuredData }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: createSafeStructuredData(websiteData) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: createSafeStructuredData(organizationData) }} />
+      {articleData && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: createSafeStructuredData(articleData) }} />
       )}
     </Helmet>
   );
