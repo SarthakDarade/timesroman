@@ -56,6 +56,8 @@ const SEOHead: React.FC<SEOHeadProps> = ({
     
   // Create comprehensive JSON-LD structured data
   const generateStructuredData = () => {
+    const structuredDataArray: any[] = [];
+    
     // Base website structured data
     const websiteData = {
       '@context': 'https://schema.org',
@@ -120,58 +122,6 @@ const SEOHead: React.FC<SEOHeadProps> = ({
       }
     };
     
-    // Article structured data (only if this is an article page)
-    const articleData = isArticle && articleMeta ? {
-      '@context': 'https://schema.org',
-      '@type': 'NewsArticle',
-      headline: title,
-      description: enhancedDescription,
-      image: {
-        '@type': 'ImageObject',
-        url: ogImage,
-        width: 1200,
-        height: 630,
-        caption: title
-      },
-      datePublished: articleMeta.publishedTime || new Date().toISOString(),
-      dateModified: articleMeta.modifiedTime || articleMeta.publishedTime || new Date().toISOString(),
-      author: {
-        '@type': 'Person',
-        name: articleMeta.author || 'Times Roman Editorial Team',
-        jobTitle: 'Journalist',
-        worksFor: {
-          '@type': 'Organization',
-          name: publisherInfo.name
-        }
-      },
-      publisher: {
-        '@type': 'NewsMediaOrganization',
-        name: publisherInfo.name,
-        url: baseUrl,
-        logo: {
-          '@type': 'ImageObject',
-          url: publisherInfo.logo,
-          width: 600,
-          height: 60
-        }
-      },
-      mainEntityOfPage: {
-        '@type': 'WebPage',
-        '@id': canonicalUrl
-      },
-      articleSection: articleMeta.category || 'News',
-      articleBody: articleMeta.content?.substring(0, 500) || '',
-      wordCount: articleMeta.content?.split(' ').length || 0,
-      inLanguage: lang,
-      copyrightHolder: {
-        '@type': 'Organization',
-        name: publisherInfo.name
-      },
-      copyrightYear: new Date().getFullYear(),
-      isAccessibleForFree: true,
-      genre: 'news'
-    } : null;
-
     // Breadcrumb data for better navigation understanding
     const breadcrumbData = {
       '@context': 'https://schema.org',
@@ -203,8 +153,63 @@ const SEOHead: React.FC<SEOHeadProps> = ({
       });
     }
     
-    const structuredDataArray = [websiteData, organizationData, breadcrumbData];
-    if (articleData) structuredDataArray.push(articleData);
+    structuredDataArray.push(websiteData, organizationData, breadcrumbData);
+    
+    // Article structured data (only if this is an article page)
+    if (isArticle && articleMeta) {
+      const articleData = {
+        '@context': 'https://schema.org',
+        '@type': 'NewsArticle',
+        headline: title,
+        description: enhancedDescription,
+        image: {
+          '@type': 'ImageObject',
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          caption: title
+        },
+        datePublished: articleMeta.publishedTime || new Date().toISOString(),
+        dateModified: articleMeta.modifiedTime || articleMeta.publishedTime || new Date().toISOString(),
+        author: {
+          '@type': 'Person',
+          name: articleMeta.author || 'Times Roman Editorial Team',
+          jobTitle: 'Journalist',
+          worksFor: {
+            '@type': 'Organization',
+            name: publisherInfo.name
+          }
+        },
+        publisher: {
+          '@type': 'NewsMediaOrganization',
+          name: publisherInfo.name,
+          url: baseUrl,
+          logo: {
+            '@type': 'ImageObject',
+            url: publisherInfo.logo,
+            width: 600,
+            height: 60
+          }
+        },
+        mainEntityOfPage: {
+          '@type': 'WebPage',
+          '@id': canonicalUrl
+        },
+        articleSection: articleMeta.category || 'News',
+        articleBody: articleMeta.content?.substring(0, 500) || '',
+        wordCount: articleMeta.content?.split(' ').length || 0,
+        inLanguage: lang,
+        copyrightHolder: {
+          '@type': 'Organization',
+          name: publisherInfo.name
+        },
+        copyrightYear: new Date().getFullYear(),
+        isAccessibleForFree: true,
+        genre: 'news'
+      };
+      
+      structuredDataArray.push(articleData);
+    }
     
     return JSON.stringify(structuredDataArray);
   };
