@@ -56,8 +56,6 @@ const SEOHead: React.FC<SEOHeadProps> = ({
     
   // Create comprehensive JSON-LD structured data
   const generateStructuredData = () => {
-    const structuredDataArray: any[] = [];
-    
     // Base website structured data
     const websiteData = {
       '@context': 'https://schema.org',
@@ -136,6 +134,9 @@ const SEOHead: React.FC<SEOHeadProps> = ({
       ]
     };
 
+    // Create the final array using proper array construction
+    const structuredDataArray = [websiteData, organizationData, breadcrumbData];
+
     // Add category to breadcrumb if it's an article
     if (isArticle && articleMeta?.category) {
       breadcrumbData.itemListElement.push({
@@ -152,8 +153,6 @@ const SEOHead: React.FC<SEOHeadProps> = ({
         item: canonicalUrl
       });
     }
-    
-    structuredDataArray.push(websiteData, organizationData, breadcrumbData);
     
     // Article structured data (only if this is an article page)
     if (isArticle && articleMeta) {
@@ -211,8 +210,24 @@ const SEOHead: React.FC<SEOHeadProps> = ({
       structuredDataArray.push(articleData);
     }
     
-    return JSON.stringify(structuredDataArray);
+    // Safely stringify the data to avoid Symbol conversion issues
+    try {
+      return JSON.stringify(structuredDataArray);
+    } catch (error) {
+      console.error('Error stringifying structured data:', error);
+      // Return a minimal fallback structured data
+      return JSON.stringify([{
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: siteName,
+        url: baseUrl,
+        description: enhancedDescription
+      }]);
+    }
   };
+
+  // Generate the structured data string
+  const structuredDataString = generateStructuredData();
 
   return (
     <Helmet htmlAttributes={{ lang }}>
@@ -279,8 +294,11 @@ const SEOHead: React.FC<SEOHeadProps> = ({
       {/* RSS Feed Link */}
       <link rel="alternate" type="application/rss+xml" title={`${siteName} RSS Feed`} href={`${baseUrl}/rss.xml`} />
       
-      {/* JSON-LD structured data */}
-      <script type="application/ld+json">{generateStructuredData()}</script>
+      {/* JSON-LD structured data - using dangerouslySetInnerHTML to avoid React processing */}
+      <script 
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: structuredDataString }}
+      />
     </Helmet>
   );
 };
