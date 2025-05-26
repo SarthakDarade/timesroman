@@ -53,148 +53,138 @@ const SEOHead: React.FC<SEOHeadProps> = ({
   const enhancedDescription = description && description.length < 120 
     ? `${description} Stay informed with Times Roman's comprehensive news coverage.` 
     : description;
-    
-  // Create a safe JSON string generation function
-  const createSafeJsonString = (data: any): string => {
+
+  // Safe string conversion function
+  const safeString = (value: any): string => {
+    if (value === null || value === undefined) return '';
+    if (typeof value === 'string') return value;
+    if (typeof value === 'number') return value.toString();
+    if (typeof value === 'boolean') return value.toString();
+    // Handle symbols and other non-serializable values
     try {
-      // Convert to plain object to remove any React symbols or functions
-      const plainData = JSON.parse(JSON.stringify(data, (key, value) => {
-        // Filter out any non-serializable values
-        if (typeof value === 'function' || typeof value === 'symbol' || typeof value === 'undefined') {
-          return null;
-        }
-        return value;
-      }));
-      
-      return JSON.stringify(plainData);
-    } catch (error) {
-      console.error('Error creating JSON string:', error);
-      return '{}';
-    }
-  };
-  
-  // Create individual structured data objects as plain objects
-  const websiteData = {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    name: String(siteName),
-    alternateName: 'Times Roman News',
-    url: String(baseUrl),
-    description: String(enhancedDescription || ''),
-    inLanguage: String(lang),
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: {
-        '@type': 'EntryPoint',
-        urlTemplate: `${baseUrl}/search?q={search_term_string}`
-      },
-      'query-input': 'required name=search_term_string'
-    },
-    publisher: {
-      '@type': 'Organization',
-      name: String(publisherInfo.name),
-      url: String(baseUrl),
-      logo: {
-        '@type': 'ImageObject',
-        url: String(publisherInfo.logo),
-        width: 600,
-        height: 60
-      }
-    }
-  };
-  
-  const organizationData = {
-    '@context': 'https://schema.org',
-    '@type': 'NewsMediaOrganization',
-    name: String(publisherInfo.name),
-    alternateName: 'Times Roman News',
-    url: String(baseUrl),
-    description: 'Next-generation AI-powered news platform delivering fresh, unbiased perspectives on current events.',
-    foundingDate: '2024',
-    logo: {
-      '@type': 'ImageObject',
-      url: String(publisherInfo.logo),
-      width: 600,
-      height: 60,
-      caption: 'Times Roman Logo'
-    },
-    sameAs: [
-      'https://x.com/timesroman_in',
-      'https://www.linkedin.com/company/times-roman/',
-      'https://www.instagram.com/timesroman.in/',
-      'https://whatsapp.com/channel/0029VbApDCe6GcG9wAYtkN0p'
-    ],
-    contactPoint: {
-      '@type': 'ContactPoint',
-      contactType: 'customer service',
-      email: 'contact@timesroman.in',
-      url: `${baseUrl}/contact`
-    },
-    address: {
-      '@type': 'PostalAddress',
-      addressCountry: 'IN'
+      return String(value);
+    } catch {
+      return '';
     }
   };
 
-  // Generate safe JSON strings for each structured data block
-  const websiteJsonString = createSafeJsonString(websiteData);
-  const organizationJsonString = createSafeJsonString(organizationData);
-  
-  // Article structured data (only if this is an article page)
-  let articleJsonString = '';
+  // Create structured data for website
+  const websiteStructuredData = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": safeString(siteName),
+    "alternateName": "Times Roman News",
+    "url": safeString(baseUrl),
+    "description": safeString(enhancedDescription),
+    "inLanguage": safeString(lang),
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": `${baseUrl}/search?q={search_term_string}`
+      },
+      "query-input": "required name=search_term_string"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": safeString(publisherInfo.name),
+      "url": safeString(baseUrl),
+      "logo": {
+        "@type": "ImageObject",
+        "url": safeString(publisherInfo.logo),
+        "width": 600,
+        "height": 60
+      }
+    }
+  });
+
+  // Create structured data for organization
+  const organizationStructuredData = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "NewsMediaOrganization",
+    "name": safeString(publisherInfo.name),
+    "alternateName": "Times Roman News",
+    "url": safeString(baseUrl),
+    "description": "Next-generation AI-powered news platform delivering fresh, unbiased perspectives on current events.",
+    "foundingDate": "2024",
+    "logo": {
+      "@type": "ImageObject",
+      "url": safeString(publisherInfo.logo),
+      "width": 600,
+      "height": 60,
+      "caption": "Times Roman Logo"
+    },
+    "sameAs": [
+      "https://x.com/timesroman_in",
+      "https://www.linkedin.com/company/times-roman/",
+      "https://www.instagram.com/timesroman.in/",
+      "https://whatsapp.com/channel/0029VbApDCe6GcG9wAYtkN0p"
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer service",
+      "email": "contact@timesroman.in",
+      "url": `${baseUrl}/contact`
+    },
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "IN"
+    }
+  });
+
+  // Create article structured data if this is an article
+  let articleStructuredData = '';
   if (isArticle && articleMeta) {
-    const articleData = {
-      '@context': 'https://schema.org',
-      '@type': 'NewsArticle',
-      headline: String(title || ''),
-      description: String(enhancedDescription || ''),
-      image: {
-        '@type': 'ImageObject',
-        url: String(ogImage),
-        width: 1200,
-        height: 630,
-        caption: String(title || '')
+    articleStructuredData = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "NewsArticle",
+      "headline": safeString(title),
+      "description": safeString(enhancedDescription),
+      "image": {
+        "@type": "ImageObject",
+        "url": safeString(ogImage),
+        "width": 1200,
+        "height": 630,
+        "caption": safeString(title)
       },
-      datePublished: String(articleMeta.publishedTime || new Date().toISOString()),
-      dateModified: String(articleMeta.modifiedTime || articleMeta.publishedTime || new Date().toISOString()),
-      author: {
-        '@type': 'Person',
-        name: String(articleMeta.author || 'Times Roman Editorial Team'),
-        jobTitle: 'Journalist',
-        worksFor: {
-          '@type': 'Organization',
-          name: String(publisherInfo.name)
+      "datePublished": safeString(articleMeta.publishedTime || new Date().toISOString()),
+      "dateModified": safeString(articleMeta.modifiedTime || articleMeta.publishedTime || new Date().toISOString()),
+      "author": {
+        "@type": "Person",
+        "name": safeString(articleMeta.author || 'Times Roman Editorial Team'),
+        "jobTitle": "Journalist",
+        "worksFor": {
+          "@type": "Organization",
+          "name": safeString(publisherInfo.name)
         }
       },
-      publisher: {
-        '@type': 'NewsMediaOrganization',
-        name: String(publisherInfo.name),
-        url: String(baseUrl),
-        logo: {
-          '@type': 'ImageObject',
-          url: String(publisherInfo.logo),
-          width: 600,
-          height: 60
+      "publisher": {
+        "@type": "NewsMediaOrganization",
+        "name": safeString(publisherInfo.name),
+        "url": safeString(baseUrl),
+        "logo": {
+          "@type": "ImageObject",
+          "url": safeString(publisherInfo.logo),
+          "width": 600,
+          "height": 60
         }
       },
-      mainEntityOfPage: {
-        '@type': 'WebPage',
-        '@id': String(canonicalUrl)
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": safeString(canonicalUrl)
       },
-      articleSection: String(articleMeta.category || 'News'),
-      articleBody: String(articleMeta.content?.substring(0, 500) || ''),
-      wordCount: Number(articleMeta.content?.split(' ').length || 0),
-      inLanguage: String(lang),
-      copyrightHolder: {
-        '@type': 'Organization',
-        name: String(publisherInfo.name)
+      "articleSection": safeString(articleMeta.category || 'News'),
+      "articleBody": safeString(articleMeta.content?.substring(0, 500) || ''),
+      "wordCount": articleMeta.content?.split(' ').length || 0,
+      "inLanguage": safeString(lang),
+      "copyrightHolder": {
+        "@type": "Organization",
+        "name": safeString(publisherInfo.name)
       },
-      copyrightYear: new Date().getFullYear(),
-      isAccessibleForFree: true,
-      genre: 'news'
-    };
-    
-    articleJsonString = createSafeJsonString(articleData);
+      "copyrightYear": new Date().getFullYear(),
+      "isAccessibleForFree": true,
+      "genre": "news"
+    });
   }
 
   return (
@@ -262,11 +252,11 @@ const SEOHead: React.FC<SEOHeadProps> = ({
       {/* RSS Feed Link */}
       <link rel="alternate" type="application/rss+xml" title={`${siteName} RSS Feed`} href={`${baseUrl}/rss.xml`} />
       
-      {/* JSON-LD structured data - split into separate script tags to avoid conflicts */}
-      <script type="application/ld+json">{websiteJsonString}</script>
-      <script type="application/ld+json">{organizationJsonString}</script>
-      {articleJsonString && (
-        <script type="application/ld+json">{articleJsonString}</script>
+      {/* JSON-LD structured data - using safe string conversion */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: websiteStructuredData }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: organizationStructuredData }} />
+      {articleStructuredData && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: articleStructuredData }} />
       )}
     </Helmet>
   );
