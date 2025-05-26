@@ -134,8 +134,12 @@ const SEOHead: React.FC<SEOHeadProps> = ({
       ]
     };
 
-    // Create the final array using proper array construction
-    const structuredDataArray = [websiteData, organizationData, breadcrumbData];
+    // Create the final array with proper typing
+    const structuredDataArray: Record<string, any>[] = [];
+    
+    // Add basic data
+    structuredDataArray.push(websiteData);
+    structuredDataArray.push(organizationData);
 
     // Add category to breadcrumb if it's an article
     if (isArticle && articleMeta?.category) {
@@ -153,6 +157,8 @@ const SEOHead: React.FC<SEOHeadProps> = ({
         item: canonicalUrl
       });
     }
+    
+    structuredDataArray.push(breadcrumbData);
     
     // Article structured data (only if this is an article page)
     if (isArticle && articleMeta) {
@@ -212,7 +218,15 @@ const SEOHead: React.FC<SEOHeadProps> = ({
     
     // Safely stringify the data to avoid Symbol conversion issues
     try {
-      return JSON.stringify(structuredDataArray);
+      // Clean the data to remove any potential Symbol values
+      const cleanData = JSON.parse(JSON.stringify(structuredDataArray, (key, value) => {
+        if (typeof value === 'symbol') {
+          return value.toString();
+        }
+        return value;
+      }));
+      
+      return JSON.stringify(cleanData);
     } catch (error) {
       console.error('Error stringifying structured data:', error);
       // Return a minimal fallback structured data
@@ -221,7 +235,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({
         '@type': 'WebSite',
         name: siteName,
         url: baseUrl,
-        description: enhancedDescription
+        description: enhancedDescription || 'Times Roman News'
       }]);
     }
   };
