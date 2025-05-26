@@ -78,7 +78,7 @@
     "tailwindcss": "^3.4.0",
     "typescript": "^5.0.0"
   }
-}
+},
 "scripts": {
   "build:dev": "vite build --mode development"
 }
