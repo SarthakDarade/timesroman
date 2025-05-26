@@ -54,194 +54,148 @@ const SEOHead: React.FC<SEOHeadProps> = ({
     ? `${description} Stay informed with Times Roman's comprehensive news coverage.` 
     : description;
     
-  // Create comprehensive JSON-LD structured data
-  const generateStructuredData = () => {
-    // Base website structured data
-    const websiteData = {
-      '@context': 'https://schema.org',
-      '@type': 'WebSite',
-      name: siteName,
-      alternateName: 'Times Roman News',
-      url: baseUrl,
-      description: enhancedDescription,
-      inLanguage: lang,
-      potentialAction: {
-        '@type': 'SearchAction',
-        target: {
-          '@type': 'EntryPoint',
-          urlTemplate: `${baseUrl}/search?q={search_term_string}`
-        },
-        'query-input': 'required name=search_term_string'
-      },
-      publisher: {
-        '@type': 'Organization',
-        name: publisherInfo.name,
-        url: baseUrl,
-        logo: {
-          '@type': 'ImageObject',
-          url: publisherInfo.logo,
-          width: 600,
-          height: 60
-        }
-      }
-    };
-    
-    // Organization data with enhanced information
-    const organizationData = {
-      '@context': 'https://schema.org',
-      '@type': 'NewsMediaOrganization',
-      name: publisherInfo.name,
-      alternateName: 'Times Roman News',
-      url: baseUrl,
-      description: 'Next-generation AI-powered news platform delivering fresh, unbiased perspectives on current events.',
-      foundingDate: '2024',
-      logo: {
-        '@type': 'ImageObject',
-        url: publisherInfo.logo,
-        width: 600,
-        height: 60,
-        caption: 'Times Roman Logo'
-      },
-      sameAs: [
-        'https://x.com/timesroman_in',
-        'https://www.linkedin.com/company/times-roman/',
-        'https://www.instagram.com/timesroman.in/',
-        'https://whatsapp.com/channel/0029VbApDCe6GcG9wAYtkN0p'
-      ],
-      contactPoint: {
-        '@type': 'ContactPoint',
-        contactType: 'customer service',
-        email: 'contact@timesroman.in',
-        url: `${baseUrl}/contact`
-      },
-      address: {
-        '@type': 'PostalAddress',
-        addressCountry: 'IN'
-      }
-    };
-    
-    // Breadcrumb data for better navigation understanding
-    const breadcrumbData = {
-      '@context': 'https://schema.org',
-      '@type': 'BreadcrumbList',
-      itemListElement: [
-        {
-          '@type': 'ListItem',
-          position: 1,
-          name: 'Home',
-          item: baseUrl
-        }
-      ]
-    };
-
-    // Create the final array with proper typing
-    const structuredDataArray: Record<string, any>[] = [];
-    
-    // Add basic data
-    structuredDataArray.push(websiteData);
-    structuredDataArray.push(organizationData);
-
-    // Add category to breadcrumb if it's an article
-    if (isArticle && articleMeta?.category) {
-      breadcrumbData.itemListElement.push({
-        '@type': 'ListItem',
-        position: 2,
-        name: articleMeta.category,
-        item: `${baseUrl}/category/${articleMeta.category.toLowerCase().replace(/\s+/g, '-')}`
-      });
-      
-      breadcrumbData.itemListElement.push({
-        '@type': 'ListItem',
-        position: 3,
-        name: title,
-        item: canonicalUrl
-      });
-    }
-    
-    structuredDataArray.push(breadcrumbData);
-    
-    // Article structured data (only if this is an article page)
-    if (isArticle && articleMeta) {
-      const articleData = {
-        '@context': 'https://schema.org',
-        '@type': 'NewsArticle',
-        headline: title,
-        description: enhancedDescription,
-        image: {
-          '@type': 'ImageObject',
-          url: ogImage,
-          width: 1200,
-          height: 630,
-          caption: title
-        },
-        datePublished: articleMeta.publishedTime || new Date().toISOString(),
-        dateModified: articleMeta.modifiedTime || articleMeta.publishedTime || new Date().toISOString(),
-        author: {
-          '@type': 'Person',
-          name: articleMeta.author || 'Times Roman Editorial Team',
-          jobTitle: 'Journalist',
-          worksFor: {
-            '@type': 'Organization',
-            name: publisherInfo.name
-          }
-        },
-        publisher: {
-          '@type': 'NewsMediaOrganization',
-          name: publisherInfo.name,
-          url: baseUrl,
-          logo: {
-            '@type': 'ImageObject',
-            url: publisherInfo.logo,
-            width: 600,
-            height: 60
-          }
-        },
-        mainEntityOfPage: {
-          '@type': 'WebPage',
-          '@id': canonicalUrl
-        },
-        articleSection: articleMeta.category || 'News',
-        articleBody: articleMeta.content?.substring(0, 500) || '',
-        wordCount: articleMeta.content?.split(' ').length || 0,
-        inLanguage: lang,
-        copyrightHolder: {
-          '@type': 'Organization',
-          name: publisherInfo.name
-        },
-        copyrightYear: new Date().getFullYear(),
-        isAccessibleForFree: true,
-        genre: 'news'
-      };
-      
-      structuredDataArray.push(articleData);
-    }
-    
-    // Safely stringify the data to avoid Symbol conversion issues
+  // Create a safe JSON string generation function
+  const createSafeJsonString = (data: any): string => {
     try {
-      // Clean the data to remove any potential Symbol values
-      const cleanData = JSON.parse(JSON.stringify(structuredDataArray, (key, value) => {
-        if (typeof value === 'symbol') {
-          return value.toString();
+      // Convert to plain object to remove any React symbols or functions
+      const plainData = JSON.parse(JSON.stringify(data, (key, value) => {
+        // Filter out any non-serializable values
+        if (typeof value === 'function' || typeof value === 'symbol' || typeof value === 'undefined') {
+          return null;
         }
         return value;
       }));
       
-      return JSON.stringify(cleanData);
+      return JSON.stringify(plainData);
     } catch (error) {
-      console.error('Error stringifying structured data:', error);
-      // Return a minimal fallback structured data
-      return JSON.stringify([{
-        '@context': 'https://schema.org',
-        '@type': 'WebSite',
-        name: siteName,
-        url: baseUrl,
-        description: enhancedDescription || 'Times Roman News'
-      }]);
+      console.error('Error creating JSON string:', error);
+      return '{}';
+    }
+  };
+  
+  // Create individual structured data objects as plain objects
+  const websiteData = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: String(siteName),
+    alternateName: 'Times Roman News',
+    url: String(baseUrl),
+    description: String(enhancedDescription || ''),
+    inLanguage: String(lang),
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${baseUrl}/search?q={search_term_string}`
+      },
+      'query-input': 'required name=search_term_string'
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: String(publisherInfo.name),
+      url: String(baseUrl),
+      logo: {
+        '@type': 'ImageObject',
+        url: String(publisherInfo.logo),
+        width: 600,
+        height: 60
+      }
+    }
+  };
+  
+  const organizationData = {
+    '@context': 'https://schema.org',
+    '@type': 'NewsMediaOrganization',
+    name: String(publisherInfo.name),
+    alternateName: 'Times Roman News',
+    url: String(baseUrl),
+    description: 'Next-generation AI-powered news platform delivering fresh, unbiased perspectives on current events.',
+    foundingDate: '2024',
+    logo: {
+      '@type': 'ImageObject',
+      url: String(publisherInfo.logo),
+      width: 600,
+      height: 60,
+      caption: 'Times Roman Logo'
+    },
+    sameAs: [
+      'https://x.com/timesroman_in',
+      'https://www.linkedin.com/company/times-roman/',
+      'https://www.instagram.com/timesroman.in/',
+      'https://whatsapp.com/channel/0029VbApDCe6GcG9wAYtkN0p'
+    ],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'customer service',
+      email: 'contact@timesroman.in',
+      url: `${baseUrl}/contact`
+    },
+    address: {
+      '@type': 'PostalAddress',
+      addressCountry: 'IN'
     }
   };
 
-  // Generate the structured data string
-  const structuredDataString = generateStructuredData();
+  // Generate safe JSON strings for each structured data block
+  const websiteJsonString = createSafeJsonString(websiteData);
+  const organizationJsonString = createSafeJsonString(organizationData);
+  
+  // Article structured data (only if this is an article page)
+  let articleJsonString = '';
+  if (isArticle && articleMeta) {
+    const articleData = {
+      '@context': 'https://schema.org',
+      '@type': 'NewsArticle',
+      headline: String(title || ''),
+      description: String(enhancedDescription || ''),
+      image: {
+        '@type': 'ImageObject',
+        url: String(ogImage),
+        width: 1200,
+        height: 630,
+        caption: String(title || '')
+      },
+      datePublished: String(articleMeta.publishedTime || new Date().toISOString()),
+      dateModified: String(articleMeta.modifiedTime || articleMeta.publishedTime || new Date().toISOString()),
+      author: {
+        '@type': 'Person',
+        name: String(articleMeta.author || 'Times Roman Editorial Team'),
+        jobTitle: 'Journalist',
+        worksFor: {
+          '@type': 'Organization',
+          name: String(publisherInfo.name)
+        }
+      },
+      publisher: {
+        '@type': 'NewsMediaOrganization',
+        name: String(publisherInfo.name),
+        url: String(baseUrl),
+        logo: {
+          '@type': 'ImageObject',
+          url: String(publisherInfo.logo),
+          width: 600,
+          height: 60
+        }
+      },
+      mainEntityOfPage: {
+        '@type': 'WebPage',
+        '@id': String(canonicalUrl)
+      },
+      articleSection: String(articleMeta.category || 'News'),
+      articleBody: String(articleMeta.content?.substring(0, 500) || ''),
+      wordCount: Number(articleMeta.content?.split(' ').length || 0),
+      inLanguage: String(lang),
+      copyrightHolder: {
+        '@type': 'Organization',
+        name: String(publisherInfo.name)
+      },
+      copyrightYear: new Date().getFullYear(),
+      isAccessibleForFree: true,
+      genre: 'news'
+    };
+    
+    articleJsonString = createSafeJsonString(articleData);
+  }
 
   return (
     <Helmet htmlAttributes={{ lang }}>
@@ -308,11 +262,12 @@ const SEOHead: React.FC<SEOHeadProps> = ({
       {/* RSS Feed Link */}
       <link rel="alternate" type="application/rss+xml" title={`${siteName} RSS Feed`} href={`${baseUrl}/rss.xml`} />
       
-      {/* JSON-LD structured data - using dangerouslySetInnerHTML to avoid React processing */}
-      <script 
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: structuredDataString }}
-      />
+      {/* JSON-LD structured data - split into separate script tags to avoid conflicts */}
+      <script type="application/ld+json">{websiteJsonString}</script>
+      <script type="application/ld+json">{organizationJsonString}</script>
+      {articleJsonString && (
+        <script type="application/ld+json">{articleJsonString}</script>
+      )}
     </Helmet>
   );
 };
