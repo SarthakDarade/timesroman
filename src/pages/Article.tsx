@@ -15,12 +15,17 @@ interface Article {
   title: string;
   excerpt: string;
   content: string;
-  imageUrl: string;
+  image_url: string;
   author: string;
   category: string;
   created_at: string;
   updated_at: string;
-  view_count: number;
+  views: number;
+  date: string;
+  author_image?: string;
+  author_bio?: string;
+  read_time?: string;
+  likes?: number;
 }
 
 const Article = () => {
@@ -62,7 +67,7 @@ const Article = () => {
           hasIncrementedView.current = true;
           const { error: updateError } = await supabase
             .from('articles')
-            .update({ view_count: (articleData.view_count || 0) + 1 })
+            .update({ views: (articleData.views || 0) + 1 })
             .eq('id', id);
 
           if (updateError) {
@@ -143,13 +148,6 @@ const Article = () => {
     );
   }
 
-  // Standardize article structure
-  const standardizedArticle = {
-    ...article,
-    created_at: article.created_at,
-    updated_at: article.updated_at || article.created_at
-  };
-
   // Enhanced SEO data for article page
   const articleDescription = generateMetaDescription(
     article.excerpt || '', 
@@ -165,7 +163,7 @@ const Article = () => {
   
   const articleBreadcrumbs = generateBreadcrumbs(location.pathname, article.title);
   
-  const optimizedImageUrl = optimizeImageUrl(article.imageUrl, 1200, 630);
+  const optimizedImageUrl = optimizeImageUrl(article.image_url, 1200, 630);
   
   // Strip HTML tags from content for SEO
   const stripHtml = (html: string) => {
@@ -186,8 +184,8 @@ const Article = () => {
         canonical={currentUrl}
         isArticle={true}
         articleMeta={{
-          publishedTime: standardizedArticle.created_at,
-          modifiedTime: standardizedArticle.updated_at,
+          publishedTime: article.created_at,
+          modifiedTime: article.updated_at,
           author: article.author,
           category: article.category,
           content: articleContent,
@@ -208,7 +206,20 @@ const Article = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Main Article Content */}
           <div className="lg:col-span-3">
-            <ArticlePage article={standardizedArticle} />
+            <ArticlePage 
+              id={article.id}
+              title={article.title}
+              content={article.content || ''}
+              category={article.category}
+              date={article.date}
+              author={article.author}
+              authorImage={article.author_image}
+              authorBio={article.author_bio}
+              imageUrl={article.image_url}
+              readTime={article.read_time || '3 min'}
+              views={article.views}
+              likes={article.likes || 0}
+            />
           </div>
           
           {/* Related Articles Sidebar */}
@@ -220,8 +231,14 @@ const Article = () => {
                   {relatedArticles.map((relatedArticle) => (
                     <ArticleCard
                       key={relatedArticle.id}
-                      article={relatedArticle}
-                      variant="compact"
+                      id={relatedArticle.id}
+                      title={relatedArticle.title}
+                      excerpt={relatedArticle.excerpt}
+                      category={relatedArticle.category}
+                      date={relatedArticle.date}
+                      imageUrl={relatedArticle.image_url}
+                      views={relatedArticle.views}
+                      className="compact"
                     />
                   ))}
                 </div>

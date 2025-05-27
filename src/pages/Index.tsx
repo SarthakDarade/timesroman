@@ -19,12 +19,13 @@ interface Article {
   title: string;
   excerpt: string;
   content: string;
-  imageUrl: string;
+  image_url: string;
   author: string;
   category: string;
   created_at: string;
   updated_at: string;
-  view_count: number;
+  views: number;
+  date: string;
 }
 
 const Index = () => {
@@ -90,12 +91,13 @@ const Index = () => {
     title: 'Welcome to Times Roman',
     excerpt: 'Your trusted source for breaking news, analysis and updates from India and around the world.',
     content: 'Stay informed with the latest news and updates.',
-    imageUrl: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+    image_url: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
     author: 'Times Roman Team',
     category: 'General',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-    view_count: 0
+    views: 0,
+    date: new Date().toLocaleDateString()
   };
 
   return (
@@ -127,7 +129,12 @@ const Index = () => {
             <section aria-labelledby="featured-news">
               <h2 id="featured-news" className="sr-only">Featured News</h2>
               <FeaturedArticle 
-                article={articles[0] || fallbackFeaturedArticle} 
+                id={(articles[0] || fallbackFeaturedArticle).id}
+                title={(articles[0] || fallbackFeaturedArticle).title}
+                excerpt={(articles[0] || fallbackFeaturedArticle).excerpt}
+                category={(articles[0] || fallbackFeaturedArticle).category}
+                date={(articles[0] || fallbackFeaturedArticle).date}
+                imageUrl={(articles[0] || fallbackFeaturedArticle).image_url}
               />
             </section>
 

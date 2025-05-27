@@ -1,18 +1,35 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Clock, BookOpen, Eye } from 'lucide-react';
 
-interface ArticleCardProps {
+interface Article {
   id: string;
   title: string;
-  excerpt?: string;
+  excerpt: string;
+  content: string;
+  image_url: string;
+  author: string;
   category: string;
+  created_at: string;
+  updated_at: string;
+  views: number;
   date: string;
-  imageUrl: string;
+}
+
+interface ArticleCardProps {
+  id?: string;
+  title?: string;
+  excerpt?: string;
+  category?: string;
+  date?: string;
+  imageUrl?: string;
   readTime?: string;
   views?: number;
   className?: string;
   style?: React.CSSProperties;
+  variant?: string;
+  article?: Article;
 }
 
 const ArticleCard: React.FC<ArticleCardProps> = ({
@@ -26,10 +43,23 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
   views,
   className = '',
   style,
+  variant,
+  article,
 }) => {
+  // Use article prop if provided, otherwise use individual props
+  const articleData = article || {
+    id: id!,
+    title: title!,
+    excerpt: excerpt!,
+    category: category!,
+    date: date!,
+    image_url: imageUrl!,
+    views: views || 0,
+  };
+
   // Map category to color class
   const getCategoryClass = () => {
-    switch (category.toLowerCase()) {
+    switch (articleData.category.toLowerCase()) {
       case 'technology': return 'bg-blue-600';
       case 'business': return 'bg-green-600';
       case 'health': return 'bg-purple-600';
@@ -72,21 +102,24 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
   };
 
   // Random view count for display if not provided
-  const displayViews = views !== undefined ? views : Math.floor(Math.random() * 500) + 100;
+  const displayViews = articleData.views !== undefined ? articleData.views : Math.floor(Math.random() * 500) + 100;
   
   // Generate low-quality image placeholder
   const blurHash = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzIDIiPjwvc3ZnPg==';
+
+  // Determine if this is a compact variant
+  const isCompact = variant === 'compact' || className.includes('compact');
 
   return (
     <article 
       className={`group overflow-hidden rounded-lg shadow-sm hover:shadow-xl transition-all duration-500 article-card-animate h-full flex flex-col ${className}`} 
       style={style}
     >
-      <Link to={`/article/${id}`} className="block h-full flex flex-col" aria-label={`Read article: ${title}`}>
-        <div className="aspect-[16/10] overflow-hidden bg-gray-100">
+      <Link to={`/article/${articleData.id}`} className="block h-full flex flex-col" aria-label={`Read article: ${articleData.title}`}>
+        <div className={`${isCompact ? 'aspect-[16/10]' : 'aspect-[16/10]'} overflow-hidden bg-gray-100`}>
           <img
-            src={imageUrl}
-            alt={title}
+            src={articleData.image_url || imageUrl!}
+            alt={articleData.title}
             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
             loading="lazy"
             width="400"
@@ -95,11 +128,11 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
               const target = e.target as HTMLImageElement;
               target.src = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80';
             }}
-            srcSet={`${imageUrl} 800w, 
-                    ${imageUrl.replace(/(\?.*)?$/, '?w=400')} 400w`}
+            srcSet={`${articleData.image_url || imageUrl} 800w, 
+                    ${(articleData.image_url || imageUrl!)?.replace(/(\?.*)?$/, '?w=400')} 400w`}
             sizes="(max-width: 768px) 100vw, 400px"
             style={{
-              backgroundColor: '#e5e7eb', // Gray placeholder until image loads
+              backgroundColor: '#e5e7eb',
               backgroundImage: `url(${blurHash})`,
               backgroundSize: 'cover'
             }}
@@ -108,17 +141,19 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
         <div className="p-4 flex flex-col flex-grow">
           <div className="mb-2 flex items-center justify-between flex-wrap gap-2">
             <span className={`inline-block text-xs font-medium uppercase tracking-wider px-2 py-1 rounded-full text-white ${getCategoryClass()}`}>
-              {category}
+              {articleData.category}
             </span>
-            <time className="flex items-center text-gray-600 text-xs" dateTime={date}>
+            <time className="flex items-center text-gray-600 text-xs" dateTime={articleData.date}>
               <Clock className="mr-1 h-3 w-3" aria-hidden="true" />
-              <span>{date}</span>
+              <span>{articleData.date}</span>
             </time>
           </div>
-          <h3 className="mb-2 font-serif text-lg font-semibold leading-snug tracking-tight text-gray-900 group-hover:text-blue-600 text-animate">
-            {title}
+          <h3 className={`mb-2 font-serif ${isCompact ? 'text-sm' : 'text-lg'} font-semibold leading-snug tracking-tight text-gray-900 group-hover:text-blue-600 text-animate`}>
+            {articleData.title}
           </h3>
-          <p className="line-clamp-2 text-sm text-gray-600 flex-grow">{excerpt}</p>
+          {!isCompact && (
+            <p className="line-clamp-2 text-sm text-gray-600 flex-grow">{articleData.excerpt}</p>
+          )}
           
           <div className="mt-3 flex items-center justify-between text-xs text-gray-600">
             <div className="flex items-center">
