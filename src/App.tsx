@@ -1,3 +1,4 @@
+
 import React, { Suspense, lazy, useEffect } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -21,6 +22,7 @@ const About = lazy(() => import("./pages/About"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const Terms = lazy(() => import("./pages/Terms"));
+const Disclaimer = lazy(() => import("./pages/Disclaimer"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Fallback loading component
@@ -72,10 +74,10 @@ const AppContent = () => {
         links.forEach(link => {
           const href = link.getAttribute('href');
           if (href && href.startsWith('/article/')) {
-            // Preload the Article component when idle (no need to call .preload())
+            // Preload the Article component when idle
             import("./pages/Article");
           } else if (href && href.startsWith('/category/')) {
-            // Preload the Category component when idle (no need to call .preload())
+            // Preload the Category component when idle
             import("./pages/Category");
           }
         });
@@ -152,6 +154,14 @@ const AppContent = () => {
             element={
               <Suspense fallback={<PageLoadingFallback />}>
                 <Terms />
+              </Suspense>
+            } 
+          />
+          <Route 
+            path="/disclaimer" 
+            element={
+              <Suspense fallback={<PageLoadingFallback />}>
+                <Disclaimer />
               </Suspense>
             } 
           />
