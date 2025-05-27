@@ -15,8 +15,6 @@ type AuthContextType = {
   signInWithFacebook: () => Promise<void>;
   signInWithTwitter: () => Promise<void>;
   signInWithLinkedIn: () => Promise<void>;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, metadata?: any) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -35,52 +33,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(data.session?.user ?? null);
     } catch (error: any) {
       console.error('Error refreshing session:', error.message);
-    }
-  };
-
-  const signIn = async (email: string, password: string) => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      
-      if (error) throw error;
-      
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
-    } catch (error: any) {
-      console.error('Error signing in:', error.message);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const signUp = async (email: string, password: string, metadata?: any) => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: metadata || {}
-        }
-      });
-      
-      if (error) throw error;
-      
-      // Don't automatically set session for sign up since email confirmation might be required
-      if (data.session) {
-        setSession(data.session);
-        setUser(data.session?.user ?? null);
-      }
-    } catch (error: any) {
-      console.error('Error signing up:', error.message);
-      throw error;
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -214,9 +166,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       signInWithGoogle,
       signInWithFacebook,
       signInWithTwitter,
-      signInWithLinkedIn,
-      signIn,
-      signUp
+      signInWithLinkedIn
     }}>
       {children}
     </AuthContext.Provider>

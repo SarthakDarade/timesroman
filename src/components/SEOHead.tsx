@@ -28,8 +28,8 @@ interface SEOHeadProps {
 }
 
 const SEOHead: React.FC<SEOHeadProps> = ({
-  title = 'Times Roman News - Breaking News, Latest News, India News, World News',
-  description = 'Breaking News in India: Read Latest News on Sports, Business, Entertainment, World News and Political News. Get accurate, AI-powered news coverage.',
+  title = 'Times Roman News',
+  description = 'Breaking News in India: Read Latest News on Sports, Business, Entertainment, World News and Political News.',
   ogImage = 'https://i.ibb.co/Z6ffRH7K/Timesromancir-logo.png',
   ogType = 'website',
   canonical,
@@ -42,171 +42,93 @@ const SEOHead: React.FC<SEOHeadProps> = ({
   lang = 'en'
 }) => {
   const siteName = 'Times Roman';
-  const twitterHandle = '@timesroman_in';
+  const twitterHandle = '@timesroman';
   
   // Use window.location.href safely by checking if window exists (for SSR compatibility)
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
   const canonicalUrl = canonical || currentUrl;
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://timesroman.in';
 
-  // Ensure description is optimal for SEO (120-160 characters)
+  // Ensure description is not too short (minimum 120 characters for SEO)
   const enhancedDescription = description && description.length < 120 
-    ? `${description} Stay informed with Times Roman's comprehensive news coverage.` 
+    ? `${description} Read more on Times Roman, the next-generation AI-powered news platform.` 
     : description;
-
-  // Safe string conversion function to prevent Symbol errors
-  const safeString = (value: any): string => {
-    if (value === null || value === undefined) return '';
-    if (typeof value === 'string') return value;
-    if (typeof value === 'number') return value.toString();
-    if (typeof value === 'boolean') return value.toString();
-    // Handle symbols and other non-serializable values safely
-    if (typeof value === 'symbol') return '';
-    try {
-      return String(value);
-    } catch {
-      return '';
-    }
-  };
-
-  // Create safe structured data objects
-  const createSafeStructuredData = (data: any) => {
-    const cleanData = JSON.parse(JSON.stringify(data, (key, value) => {
-      // Replace any problematic values with safe strings
-      if (typeof value === 'symbol' || typeof value === 'function') {
-        return '';
+    
+  // Create JSON-LD structured data
+  const generateStructuredData = () => {
+    // Base website structured data
+    const websiteData = {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: siteName,
+      url: canonicalUrl.split('/').slice(0, 3).join('/'), // Root domain
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: `${canonicalUrl.split('/').slice(0, 3).join('/')}/search?q={search_term_string}`,
+        'query-input': 'required name=search_term_string'
       }
-      return safeString(value);
-    }));
-    return JSON.stringify(cleanData);
-  };
-
-  // Create structured data for website
-  const websiteData = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": safeString(siteName),
-    "alternateName": "Times Roman News",
-    "url": safeString(baseUrl),
-    "description": safeString(enhancedDescription),
-    "inLanguage": safeString(lang),
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": {
-        "@type": "EntryPoint",
-        "urlTemplate": `${baseUrl}/search?q={search_term_string}`
-      },
-      "query-input": "required name=search_term_string"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": safeString(publisherInfo.name),
-      "url": safeString(baseUrl),
-      "logo": {
-        "@type": "ImageObject",
-        "url": safeString(publisherInfo.logo),
-        "width": 600,
-        "height": 60
-      }
-    }
-  };
-
-  // Create structured data for organization
-  const organizationData = {
-    "@context": "https://schema.org",
-    "@type": "NewsMediaOrganization",
-    "name": safeString(publisherInfo.name),
-    "alternateName": "Times Roman News",
-    "url": safeString(baseUrl),
-    "description": "Next-generation AI-powered news platform delivering fresh, unbiased perspectives on current events.",
-    "foundingDate": "2024",
-    "logo": {
-      "@type": "ImageObject",
-      "url": safeString(publisherInfo.logo),
-      "width": 600,
-      "height": 60,
-      "caption": "Times Roman Logo"
-    },
-    "sameAs": [
-      "https://x.com/timesroman_in",
-      "https://www.linkedin.com/company/times-roman/",
-      "https://www.instagram.com/timesroman.in/",
-      "https://whatsapp.com/channel/0029VbApDCe6GcG9wAYtkN0p"
-    ],
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "contactType": "customer service",
-      "email": "contact@timesroman.in",
-      "url": `${baseUrl}/contact`
-    },
-    "address": {
-      "@type": "PostalAddress",
-      "addressCountry": "IN"
-    }
-  };
-
-  // Create article structured data if this is an article
-  let articleData = null;
-  if (isArticle && articleMeta) {
-    articleData = {
-      "@context": "https://schema.org",
-      "@type": "NewsArticle",
-      "headline": safeString(title),
-      "description": safeString(enhancedDescription),
-      "image": {
-        "@type": "ImageObject",
-        "url": safeString(ogImage),
-        "width": 1200,
-        "height": 630,
-        "caption": safeString(title)
-      },
-      "datePublished": safeString(articleMeta.publishedTime || new Date().toISOString()),
-      "dateModified": safeString(articleMeta.modifiedTime || articleMeta.publishedTime || new Date().toISOString()),
-      "author": {
-        "@type": "Person",
-        "name": safeString(articleMeta.author || 'Times Roman Editorial Team'),
-        "jobTitle": "Journalist",
-        "worksFor": {
-          "@type": "Organization",
-          "name": safeString(publisherInfo.name)
-        }
-      },
-      "publisher": {
-        "@type": "NewsMediaOrganization",
-        "name": safeString(publisherInfo.name),
-        "url": safeString(baseUrl),
-        "logo": {
-          "@type": "ImageObject",
-          "url": safeString(publisherInfo.logo),
-          "width": 600,
-          "height": 60
-        }
-      },
-      "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": safeString(canonicalUrl)
-      },
-      "articleSection": safeString(articleMeta.category || 'News'),
-      "articleBody": safeString(articleMeta.content?.substring(0, 500) || ''),
-      "wordCount": articleMeta.content?.split(' ').length || 0,
-      "inLanguage": safeString(lang),
-      "copyrightHolder": {
-        "@type": "Organization",
-        "name": safeString(publisherInfo.name)
-      },
-      "copyrightYear": new Date().getFullYear(),
-      "isAccessibleForFree": true,
-      "genre": "news"
     };
-  }
+    
+    // Organization data
+    const organizationData = {
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: publisherInfo.name,
+      url: canonicalUrl.split('/').slice(0, 3).join('/'),
+      logo: {
+        '@type': 'ImageObject',
+        url: publisherInfo.logo,
+        width: 600,
+        height: 60
+      },
+      sameAs: [
+        'https://twitter.com/timesroman',
+        'https://facebook.com/timesroman'
+      ]
+    };
+    
+    // Article structured data (only if this is an article page)
+    const articleData = isArticle && articleMeta ? {
+      '@context': 'https://schema.org',
+      '@type': 'NewsArticle',
+      headline: title,
+      image: [ogImage],
+      datePublished: articleMeta.publishedTime,
+      dateModified: articleMeta.modifiedTime || articleMeta.publishedTime,
+      author: {
+        '@type': 'Organization',
+        name: articleMeta.author || 'Times Roman'
+      },
+      publisher: {
+        '@type': 'Organization',
+        name: publisherInfo.name,
+        logo: {
+          '@type': 'ImageObject',
+          url: publisherInfo.logo,
+          width: 600,
+          height: 60
+        }
+      },
+      description: enhancedDescription,
+      mainEntityOfPage: {
+        '@type': 'WebPage',
+        '@id': canonicalUrl
+      },
+      articleSection: articleMeta.category || 'News',
+      articleBody: articleMeta.content?.substring(0, 500) || ''
+    } : null;
+    
+    return JSON.stringify([
+      websiteData,
+      organizationData,
+      ...(articleData ? [articleData] : [])
+    ]);
+  };
 
   return (
     <Helmet htmlAttributes={{ lang }}>
       {/* Basic Meta Tags */}
       <title>{title}</title>
       <meta name="description" content={enhancedDescription} />
-      <meta name="keywords" content={isArticle && articleMeta ? `${articleMeta.category}, news, ${articleMeta.author}, breaking news, latest news` : 'news, breaking news, latest news, india news, world news, politics, technology, business'} />
-      <meta name="author" content={isArticle && articleMeta ? articleMeta.author : 'Times Roman Editorial Team'} />
       <link rel="canonical" href={canonicalUrl} />
 
       {/* Open Graph Tags */}
@@ -216,61 +138,37 @@ const SEOHead: React.FC<SEOHeadProps> = ({
       <meta property="og:url" content={canonicalUrl} />
       <meta property="og:type" content={isArticle ? 'article' : ogType} />
       <meta property="og:site_name" content={siteName} />
-      <meta property="og:locale" content="en_US" />
 
       {/* Twitter Card Tags */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:site" content={twitterHandle} />
-      <meta name="twitter:creator" content={twitterHandle} />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={enhancedDescription} />
       <meta name="twitter:image" content={ogImage} />
       
-      {/* Enhanced Image Meta Tags */}
+      {/* Ensure preview works on WhatsApp and other platforms */}
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
-      <meta property="og:image:type" content="image/png" />
-      <meta property="og:image:alt" content={title} />
 
-      {/* Article Specific Meta Tags */}
-      {isArticle && articleMeta && (
-        <>
-          {articleMeta.publishedTime && (
-            <meta property="article:published_time" content={articleMeta.publishedTime} />
-          )}
-          {articleMeta.modifiedTime && (
-            <meta property="article:modified_time" content={articleMeta.modifiedTime} />
-          )}
-          {articleMeta.author && (
-            <meta property="article:author" content={articleMeta.author} />
-          )}
-          {articleMeta.category && (
-            <>
-              <meta property="article:section" content={articleMeta.category} />
-              <meta property="article:tag" content={articleMeta.category} />
-            </>
-          )}
-        </>
+      {/* Article Specific Meta Tags - Only render if ogType is article and articleMeta exists */}
+      {isArticle && articleMeta && articleMeta.publishedTime && (
+        <meta property="article:published_time" content={articleMeta.publishedTime} />
+      )}
+      {isArticle && articleMeta && articleMeta.modifiedTime && (
+        <meta property="article:modified_time" content={articleMeta.modifiedTime} />
+      )}
+      {isArticle && articleMeta && articleMeta.author && (
+        <meta property="article:author" content={articleMeta.author} />
+      )}
+      {isArticle && articleMeta && articleMeta.category && (
+        <meta property="article:section" content={articleMeta.category} />
       )}
       
-      {/* Additional SEO Meta Tags */}
-      <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-      <meta name="googlebot" content="index, follow" />
-      <meta name="format-detection" content="telephone=no" />
-      <meta name="theme-color" content="#ffffff" />
+      {/* IndexNow API Key Tag */}
+      <meta name="msvalidate.01" content="YOUR_BING_VERIFICATION_ID" />
       
-      {/* Performance and Cache Headers */}
-      <meta httpEquiv="Cache-Control" content="max-age=86400, public" />
-      
-      {/* RSS Feed Link */}
-      <link rel="alternate" type="application/rss+xml" title={`${siteName} RSS Feed`} href={`${baseUrl}/rss.xml`} />
-      
-      {/* JSON-LD structured data - using safe string conversion */}
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: createSafeStructuredData(websiteData) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: createSafeStructuredData(organizationData) }} />
-      {articleData && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: createSafeStructuredData(articleData) }} />
-      )}
+      {/* JSON-LD structured data */}
+      <script type="application/ld+json">{generateStructuredData()}</script>
     </Helmet>
   );
 };
