@@ -10,12 +10,55 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { subscribeToArticleChanges } from '@/utils/realtimeHelpers';
 import { generateBreadcrumbs } from '@/utils/seoHelpers';
 
-// ... keep existing code (lazy loaded components and interfaces)
+// Lazy load components for better performance
+const TrendingNews = lazy(() => import('../components/TrendingNews'));
+const NewsletterSignup = lazy(() => import('../components/NewsletterSignup'));
+
+interface Article {
+  id: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  imageUrl: string;
+  author: string;
+  category: string;
+  created_at: string;
+  updated_at: string;
+  view_count: number;
+}
 
 const Index = () => {
-  // ... keep existing code (state variables and desired categories)
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
+  const isMobile = useIsMobile();
 
-  // ... keep existing code (fetchArticles function)
+  const desiredCategories = [
+    'politics', 'technology', 'business', 'entertainment', 
+    'sports', 'health', 'world news', 'india news', 'us news', 'latest news'
+  ];
+
+  const fetchArticles = async () => {
+    try {
+      console.log('Fetching articles from Supabase...');
+      const { data, error } = await supabase
+        .from('articles')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) {
+        console.error('Error fetching articles:', error);
+        return;
+      }
+
+      console.log('Articles fetched:', data?.length || 0);
+      setArticles(data || []);
+    } catch (error) {
+      console.error('Error in fetchArticles:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Initial fetch
@@ -41,7 +84,19 @@ const Index = () => {
     'hindi news', 'english news india', 'news website', 'online news'
   ];
 
-  // ... keep existing code (fallback featured article)
+  // Get featured article (first article or fallback)
+  const fallbackFeaturedArticle = {
+    id: 'fallback',
+    title: 'Welcome to Times Roman',
+    excerpt: 'Your trusted source for breaking news, analysis and updates from India and around the world.',
+    content: 'Stay informed with the latest news and updates.',
+    imageUrl: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+    author: 'Times Roman Team',
+    category: 'General',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    view_count: 0
+  };
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -60,7 +115,59 @@ const Index = () => {
       />
       <Navbar />
       
-      {/* ... keep existing code (main content) */}
+      <main className="container mx-auto flex-1 px-4 py-8">
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+            <p className="mt-4 text-gray-600">Loading latest news...</p>
+          </div>
+        ) : (
+          <div className="space-y-12">
+            {/* Featured Article Section */}
+            <section aria-labelledby="featured-news">
+              <h2 id="featured-news" className="sr-only">Featured News</h2>
+              <FeaturedArticle 
+                article={articles[0] || fallbackFeaturedArticle} 
+              />
+            </section>
+
+            {/* Trending News Section */}
+            <Suspense fallback={<div className="h-64 animate-pulse bg-gray-100 rounded-lg"></div>}>
+              <section aria-labelledby="trending-news">
+                <TrendingNews articles={articles.slice(1, 5)} />
+              </section>
+            </Suspense>
+
+            {/* Category Sections */}
+            <div className="space-y-12">
+              {desiredCategories.map((category) => {
+                const categoryArticles = articles.filter(
+                  (article) => article.category.toLowerCase() === category.toLowerCase()
+                );
+                
+                if (categoryArticles.length === 0) return null;
+
+                return (
+                  <section key={category} aria-labelledby={`${category}-news`}>
+                    <CategorySection
+                      title={category.charAt(0).toUpperCase() + category.slice(1)}
+                      articles={categoryArticles.slice(0, isMobile ? 3 : 6)}
+                      categoryId={category}
+                    />
+                  </section>
+                );
+              })}
+            </div>
+
+            {/* Newsletter Signup */}
+            <Suspense fallback={<div className="h-32 animate-pulse bg-gray-100 rounded-lg"></div>}>
+              <section aria-labelledby="newsletter-signup">
+                <NewsletterSignup />
+              </section>
+            </Suspense>
+          </div>
+        )}
+      </main>
       
       <Footer />
     </div>

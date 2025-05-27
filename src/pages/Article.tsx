@@ -10,13 +10,91 @@ import SEOHead from '../components/SEOHead';
 import { supabase } from '@/integrations/supabase/client';
 import { generateBreadcrumbs, generateArticleKeywords, generateMetaDescription, optimizeImageUrl } from '@/utils/seoHelpers';
 
-// ... keep existing code (interface definition)
+interface Article {
+  id: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  imageUrl: string;
+  author: string;
+  category: string;
+  created_at: string;
+  updated_at: string;
+  view_count: number;
+}
 
 const Article = () => {
-  // ... keep existing code (state variables and URL logic)
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const location = useLocation();
+  const [article, setArticle] = useState<Article | null>(null);
+  const [relatedArticles, setRelatedArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
+  const hasIncrementedView = useRef(false);
 
-  // ... keep existing code (useEffect for fetching articles and view count)
+  // Construct the current URL safely
+  const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
+
+  useEffect(() => {
+    const fetchArticle = async () => {
+      if (!id) return;
+
+      try {
+        console.log('Fetching article with ID:', id);
+        
+        // Fetch the main article
+        const { data: articleData, error: articleError } = await supabase
+          .from('articles')
+          .select('*')
+          .eq('id', id)
+          .single();
+
+        if (articleError) {
+          console.error('Error fetching article:', articleError);
+          setLoading(false);
+          return;
+        }
+
+        setArticle(articleData);
+
+        // Increment view count only once per session
+        if (articleData && !hasIncrementedView.current) {
+          hasIncrementedView.current = true;
+          const { error: updateError } = await supabase
+            .from('articles')
+            .update({ view_count: (articleData.view_count || 0) + 1 })
+            .eq('id', id);
+
+          if (updateError) {
+            console.error('Error updating view count:', updateError);
+          }
+        }
+
+        // Fetch related articles from the same category
+        if (articleData?.category) {
+          const { data: relatedData, error: relatedError } = await supabase
+            .from('articles')
+            .select('*')
+            .eq('category', articleData.category)
+            .neq('id', id)
+            .order('created_at', { ascending: false })
+            .limit(4);
+
+          if (relatedError) {
+            console.error('Error fetching related articles:', relatedError);
+          } else {
+            setRelatedArticles(relatedData || []);
+          }
+        }
+      } catch (error) {
+        console.error('Error in fetchArticle:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchArticle();
+  }, [id]);
 
   if (loading) {
     return (
@@ -65,7 +143,12 @@ const Article = () => {
     );
   }
 
-  // ... keep existing code (standardized article)
+  // Standardize article structure
+  const standardizedArticle = {
+    ...article,
+    created_at: article.created_at,
+    updated_at: article.updated_at || article.created_at
+  };
 
   // Enhanced SEO data for article page
   const articleDescription = generateMetaDescription(
@@ -84,7 +167,14 @@ const Article = () => {
   
   const optimizedImageUrl = optimizeImageUrl(article.imageUrl, 1200, 630);
   
-  // ... keep existing code (strip HTML function)
+  // Strip HTML tags from content for SEO
+  const stripHtml = (html: string) => {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
+  };
+  
+  const articleContent = stripHtml(article.content || '');
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -114,7 +204,32 @@ const Article = () => {
       <ReadingProgressBar />
       <Navbar />
       
-      {/* ... keep existing code (main content) */}
+      <main className="container mx-auto flex-1 px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Main Article Content */}
+          <div className="lg:col-span-3">
+            <ArticlePage article={standardizedArticle} />
+          </div>
+          
+          {/* Related Articles Sidebar */}
+          {relatedArticles.length > 0 && (
+            <aside className="lg:col-span-1">
+              <div className="sticky top-8">
+                <h2 className="text-xl font-bold mb-4">Related Articles</h2>
+                <div className="space-y-4">
+                  {relatedArticles.map((relatedArticle) => (
+                    <ArticleCard
+                      key={relatedArticle.id}
+                      article={relatedArticle}
+                      variant="compact"
+                    />
+                  ))}
+                </div>
+              </div>
+            </aside>
+          )}
+        </div>
+      </main>
       
       <Footer />
     </div>
