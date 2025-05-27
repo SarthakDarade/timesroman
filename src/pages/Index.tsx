@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, lazy, Suspense } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -129,12 +128,7 @@ const Index = () => {
             <section aria-labelledby="featured-news">
               <h2 id="featured-news" className="sr-only">Featured News</h2>
               <FeaturedArticle 
-                id={(articles[0] || fallbackFeaturedArticle).id}
-                title={(articles[0] || fallbackFeaturedArticle).title}
-                excerpt={(articles[0] || fallbackFeaturedArticle).excerpt}
-                category={(articles[0] || fallbackFeaturedArticle).category}
-                date={(articles[0] || fallbackFeaturedArticle).date}
-                imageUrl={(articles[0] || fallbackFeaturedArticle).image_url}
+                article={articles[0] || fallbackFeaturedArticle}
               />
             </section>
 
