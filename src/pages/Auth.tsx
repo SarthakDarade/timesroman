@@ -3,23 +3,27 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { FcGoogle } from 'react-icons/fc';
-import { FaFacebook, FaXTwitter, FaLinkedin } from 'react-icons/fa6';
+import { FaXTwitter, FaLinkedin } from 'react-icons/fa6';
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 
 const Auth = () => {
-  const { loading, signInWithGoogle, signInWithFacebook, signInWithTwitter, signInWithLinkedIn } = useAuth();
+  const { loading, signInWithGoogle, signInWithTwitter, signInWithLinkedIn, signInWithEmail, signUpWithEmail } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [authTab, setAuthTab] = useState("signin");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   
-  // Get the page they were trying to visit
   const from = location.state?.from?.pathname || "/";
 
-  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { 
@@ -46,9 +50,6 @@ const Auth = () => {
         case 'google':
           await signInWithGoogle();
           break;
-        case 'facebook':
-          await signInWithFacebook();
-          break;
         case 'twitter':
           await signInWithTwitter();
           break;
@@ -58,9 +59,42 @@ const Auth = () => {
         default:
           console.error("Unknown provider:", provider);
       }
-      // Navigation is handled by the auth state change listener
     } catch (error) {
       console.error(`${provider} sign in error:`, error);
+    }
+  };
+
+  const handleEmailSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+    try {
+      await signInWithEmail(email, password);
+    } catch (error) {
+      console.error('Email sign in error:', error);
+    }
+  };
+
+  const handleEmailSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password || !confirmPassword) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+    if (password !== confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+    if (password.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+    try {
+      await signUpWithEmail(email, password);
+    } catch (error) {
+      console.error('Email sign up error:', error);
     }
   };
 
@@ -97,27 +131,61 @@ const Auth = () => {
               variants={itemVariants}
             >
               <TabsContent value="signin" className="mt-0 space-y-6">
-                <h2 className="text-center text-xl font-semibold">Sign in with</h2>
+                <h2 className="text-center text-xl font-semibold">Sign in to your account</h2>
                 
-                <div className="space-y-4">
+                <form onSubmit={handleEmailSignIn} className="space-y-4">
+                  <div>
+                    <Label htmlFor="signin-email">Email</Label>
+                    <Input
+                      id="signin-email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter your email"
+                      required
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="signin-password">Password</Label>
+                    <Input
+                      id="signin-password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Enter your password"
+                      required
+                      className="mt-1"
+                    />
+                  </div>
+                  <Button 
+                    type="submit" 
+                    className="w-full py-6 text-base"
+                    disabled={loading}
+                  >
+                    Sign In
+                  </Button>
+                </form>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-white px-2 text-muted-foreground">Or continue with</span>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
                   <Button 
                     variant="outline" 
                     className="w-full flex items-center justify-center gap-2 py-6 text-base hover:bg-gray-50 transition-all duration-300"
                     onClick={() => handleAuthProvider('google')}
                     disabled={loading}
+                    type="button"
                   >
                     <FcGoogle className="h-6 w-6" />
                     <span>Continue with Google</span>
-                  </Button>
-
-                  <Button 
-                    variant="outline"
-                    className="w-full flex items-center justify-center gap-2 py-6 text-base hover:bg-blue-50 text-blue-600 hover:text-blue-700 border-blue-200 hover:border-blue-300 transition-all duration-300"
-                    onClick={() => handleAuthProvider('facebook')}
-                    disabled={loading}
-                  >
-                    <FaFacebook className="h-6 w-6" />
-                    <span>Continue with Facebook</span>
                   </Button>
                   
                   <Button 
@@ -125,6 +193,7 @@ const Auth = () => {
                     className="w-full flex items-center justify-center gap-2 py-6 text-base hover:bg-blue-50 text-blue-700 hover:text-blue-800 border-blue-200 hover:border-blue-300 transition-all duration-300"
                     onClick={() => handleAuthProvider('linkedin')}
                     disabled={loading}
+                    type="button"
                   >
                     <FaLinkedin className="h-6 w-6" />
                     <span>Continue with LinkedIn</span>
@@ -135,6 +204,7 @@ const Auth = () => {
                     className="w-full flex items-center justify-center gap-2 py-6 text-base hover:bg-gray-50 transition-all duration-300"
                     onClick={() => handleAuthProvider('twitter')}
                     disabled={loading}
+                    type="button"
                   >
                     <FaXTwitter className="h-6 w-6" />
                     <span>Continue with X</span>
@@ -143,27 +213,74 @@ const Auth = () => {
               </TabsContent>
               
               <TabsContent value="signup" className="mt-0 space-y-6">
-                <h2 className="text-center text-xl font-semibold">Create account with</h2>
+                <h2 className="text-center text-xl font-semibold">Create your account</h2>
                 
-                <div className="space-y-4">
+                <form onSubmit={handleEmailSignUp} className="space-y-4">
+                  <div>
+                    <Label htmlFor="signup-email">Email</Label>
+                    <Input
+                      id="signup-email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter your email"
+                      required
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="signup-password">Password</Label>
+                    <Input
+                      id="signup-password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Create a password (min 6 characters)"
+                      required
+                      minLength={6}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="confirm-password">Confirm Password</Label>
+                    <Input
+                      id="confirm-password"
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Confirm your password"
+                      required
+                      className="mt-1"
+                    />
+                  </div>
+                  <Button 
+                    type="submit" 
+                    className="w-full py-6 text-base"
+                    disabled={loading}
+                  >
+                    Create Account
+                  </Button>
+                </form>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-white px-2 text-muted-foreground">Or sign up with</span>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
                   <Button 
                     variant="outline" 
                     className="w-full flex items-center justify-center gap-2 py-6 text-base hover:bg-gray-50 transition-all duration-300"
                     onClick={() => handleAuthProvider('google')}
                     disabled={loading}
+                    type="button"
                   >
                     <FcGoogle className="h-6 w-6" />
                     <span>Sign up with Google</span>
-                  </Button>
-
-                  <Button 
-                    variant="outline"
-                    className="w-full flex items-center justify-center gap-2 py-6 text-base hover:bg-blue-50 text-blue-600 hover:text-blue-700 border-blue-200 hover:border-blue-300 transition-all duration-300"
-                    onClick={() => handleAuthProvider('facebook')}
-                    disabled={loading}
-                  >
-                    <FaFacebook className="h-6 w-6" />
-                    <span>Sign up with Facebook</span>
                   </Button>
                   
                   <Button 
@@ -171,6 +288,7 @@ const Auth = () => {
                     className="w-full flex items-center justify-center gap-2 py-6 text-base hover:bg-blue-50 text-blue-700 hover:text-blue-800 border-blue-200 hover:border-blue-300 transition-all duration-300"
                     onClick={() => handleAuthProvider('linkedin')}
                     disabled={loading}
+                    type="button"
                   >
                     <FaLinkedin className="h-6 w-6" />
                     <span>Sign up with LinkedIn</span>
@@ -181,6 +299,7 @@ const Auth = () => {
                     className="w-full flex items-center justify-center gap-2 py-6 text-base hover:bg-gray-50 transition-all duration-300"
                     onClick={() => handleAuthProvider('twitter')}
                     disabled={loading}
+                    type="button"
                   >
                     <FaXTwitter className="h-6 w-6" />
                     <span>Sign up with X</span>
@@ -194,8 +313,7 @@ const Auth = () => {
               variants={itemVariants}
             >
               <p>
-                Times Roman uses secure authentication powered by us.
-                We never store your password.
+                Times Roman uses secure authentication. We never store your password.
               </p>
               <p className="mt-4">
                 By continuing, you agree to our <a href="/terms" className="text-blue-600 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</a>.
