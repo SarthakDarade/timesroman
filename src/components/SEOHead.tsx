@@ -82,27 +82,44 @@ const SEOHead: React.FC<SEOHeadProps> = ({
     allKeywords.push(...articleMeta.tags);
   }
 
-  // Generate rich structured data
+  // Generate rich structured data - fixed to handle potential Symbol issues
   const generateStructuredData = () => {
-    const structuredDataArray = [];
+    try {
+      const structuredDataArray = [];
 
-    // Website structured data
-    const websiteData = {
-      '@context': 'https://schema.org',
-      '@type': 'WebSite',
-      name: siteName,
-      url: baseUrl,
-      description: 'Times Roman - Breaking News, Latest Updates, and In-depth Analysis',
-      potentialAction: {
-        '@type': 'SearchAction',
-        target: {
-          '@type': 'EntryPoint',
-          urlTemplate: `${baseUrl}/search?q={search_term_string}`
+      // Website structured data
+      const websiteData = {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: siteName,
+        url: baseUrl,
+        description: 'Times Roman - Breaking News, Latest Updates, and In-depth Analysis',
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: {
+            '@type': 'EntryPoint',
+            urlTemplate: `${baseUrl}/search?q={search_term_string}`
+          },
+          'query-input': 'required name=search_term_string'
         },
-        'query-input': 'required name=search_term_string'
-      },
-      publisher: {
-        '@type': 'Organization',
+        publisher: {
+          '@type': 'Organization',
+          name: publisherInfo.name,
+          url: publisherInfo.url || baseUrl,
+          logo: {
+            '@type': 'ImageObject',
+            url: publisherInfo.logo,
+            width: 600,
+            height: 60
+          }
+        }
+      };
+      structuredDataArray.push(websiteData);
+
+      // Organization data
+      const organizationData = {
+        '@context': 'https://schema.org',
+        '@type': 'NewsMediaOrganization',
         name: publisherInfo.name,
         url: publisherInfo.url || baseUrl,
         logo: {
@@ -110,99 +127,100 @@ const SEOHead: React.FC<SEOHeadProps> = ({
           url: publisherInfo.logo,
           width: 600,
           height: 60
+        },
+        sameAs: [
+          'https://x.com/timesroman_in',
+          'https://www.linkedin.com/company/times-roman/',
+          'https://www.instagram.com/timesroman.in/',
+          'https://whatsapp.com/channel/0029VbApDCe6GcG9wAYtkN0p'
+        ],
+        contactPoint: {
+          '@type': 'ContactPoint',
+          contactType: 'editorial',
+          url: `${baseUrl}/contact`
         }
-      }
-    };
-    structuredDataArray.push(websiteData);
+      };
+      structuredDataArray.push(organizationData);
 
-    // Organization data
-    const organizationData = {
-      '@context': 'https://schema.org',
-      '@type': 'NewsMediaOrganization',
-      name: publisherInfo.name,
-      url: publisherInfo.url || baseUrl,
-      logo: {
-        '@type': 'ImageObject',
-        url: publisherInfo.logo,
-        width: 600,
-        height: 60
-      },
-      sameAs: [
-        'https://x.com/timesroman_in',
-        'https://www.linkedin.com/company/times-roman/',
-        'https://www.instagram.com/timesroman.in/',
-        'https://whatsapp.com/channel/0029VbApDCe6GcG9wAYtkN0p'
-      ],
-      contactPoint: {
-        '@type': 'ContactPoint',
-        contactType: 'editorial',
-        url: `${baseUrl}/contact`
-      }
-    };
-    structuredDataArray.push(organizationData);
-
-    // Article structured data (only for article pages)
-    if (isArticle && articleMeta) {
-      const articleData = {
-        '@context': 'https://schema.org',
-        '@type': 'NewsArticle',
-        headline: title,
-        description: enhancedDescription,
-        image: {
-          '@type': 'ImageObject',
-          url: ogImage,
-          width: 1200,
-          height: 630
-        },
-        datePublished: articleMeta.publishedTime,
-        dateModified: articleMeta.modifiedTime || articleMeta.publishedTime,
-        author: {
-          '@type': 'Person',
-          name: articleMeta.author || 'Times Roman Editorial Team'
-        },
-        publisher: {
-          '@type': 'Organization',
-          name: publisherInfo.name,
-          logo: {
+      // Article structured data (only for article pages)
+      if (isArticle && articleMeta) {
+        const articleData = {
+          '@context': 'https://schema.org',
+          '@type': 'NewsArticle',
+          headline: title,
+          description: enhancedDescription,
+          image: {
             '@type': 'ImageObject',
-            url: publisherInfo.logo,
-            width: 600,
-            height: 60
-          }
-        },
-        mainEntityOfPage: {
-          '@type': 'WebPage',
-          '@id': canonicalUrl
-        },
-        articleSection: articleMeta.category || 'News',
-        articleBody: articleMeta.content?.substring(0, 500) || '',
-        keywords: allKeywords.join(', '),
-        inLanguage: lang
-      };
-      
-      if (articleMeta.tags && articleMeta.tags.length > 0) {
-        articleData.keywords = articleMeta.tags.join(', ');
+            url: ogImage,
+            width: 1200,
+            height: 630
+          },
+          datePublished: articleMeta.publishedTime,
+          dateModified: articleMeta.modifiedTime || articleMeta.publishedTime,
+          author: {
+            '@type': 'Person',
+            name: articleMeta.author || 'Times Roman Editorial Team'
+          },
+          publisher: {
+            '@type': 'Organization',
+            name: publisherInfo.name,
+            logo: {
+              '@type': 'ImageObject',
+              url: publisherInfo.logo,
+              width: 600,
+              height: 60
+            }
+          },
+          mainEntityOfPage: {
+            '@type': 'WebPage',
+            '@id': canonicalUrl
+          },
+          articleSection: articleMeta.category || 'News',
+          articleBody: articleMeta.content?.substring(0, 500) || '',
+          keywords: allKeywords.join(', '),
+          inLanguage: lang
+        };
+        
+        if (articleMeta.tags && articleMeta.tags.length > 0) {
+          articleData.keywords = articleMeta.tags.join(', ');
+        }
+        
+        structuredDataArray.push(articleData);
       }
-      
-      structuredDataArray.push(articleData);
-    }
 
-    // Breadcrumb structured data
-    if (breadcrumbs.length > 0) {
-      const breadcrumbData = {
+      // Breadcrumb structured data
+      if (breadcrumbs.length > 0) {
+        const breadcrumbData = {
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: breadcrumbs.map((crumb, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            name: crumb.name,
+            item: crumb.url.startsWith('http') ? crumb.url : `${baseUrl}${crumb.url}`
+          }))
+        };
+        structuredDataArray.push(breadcrumbData);
+      }
+
+      // Safe JSON stringification to avoid Symbol conversion issues
+      return JSON.stringify(structuredDataArray, (key, value) => {
+        // Filter out any Symbol values or functions
+        if (typeof value === 'symbol' || typeof value === 'function') {
+          return undefined;
+        }
+        return value;
+      });
+    } catch (error) {
+      console.error('Error generating structured data:', error);
+      // Return minimal valid JSON-LD if there's an error
+      return JSON.stringify([{
         '@context': 'https://schema.org',
-        '@type': 'BreadcrumbList',
-        itemListElement: breadcrumbs.map((crumb, index) => ({
-          '@type': 'ListItem',
-          position: index + 1,
-          name: crumb.name,
-          item: crumb.url.startsWith('http') ? crumb.url : `${baseUrl}${crumb.url}`
-        }))
-      };
-      structuredDataArray.push(breadcrumbData);
+        '@type': 'WebSite',
+        name: siteName,
+        url: baseUrl
+      }]);
     }
-
-    return JSON.stringify(structuredDataArray);
   };
 
   return (
@@ -291,10 +309,13 @@ const SEOHead: React.FC<SEOHeadProps> = ({
       <link rel="preconnect" href="https://images.unsplash.com" />
       <link rel="preconnect" href="https://i.ibb.co" />
 
-      {/* JSON-LD Structured Data */}
-      <script type="application/ld+json">
-        {generateStructuredData()}
-      </script>
+      {/* JSON-LD Structured Data - using dangerouslySetInnerHTML to avoid React parsing issues */}
+      <script 
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: generateStructuredData()
+        }}
+      />
     </Helmet>
   );
 };
