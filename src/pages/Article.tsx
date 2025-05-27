@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ArticlePage from '../components/ArticlePage';
@@ -8,157 +8,24 @@ import ArticleCard from '../components/ArticleCard';
 import ReadingProgressBar from '../components/ReadingProgressBar';
 import SEOHead from '../components/SEOHead';
 import { supabase } from '@/integrations/supabase/client';
+import { generateBreadcrumbs, generateArticleKeywords, generateMetaDescription, optimizeImageUrl } from '@/utils/seoHelpers';
 
-interface Article {
-  id: string;
-  title: string;
-  content?: string;
-  excerpt?: string;
-  category: string;
-  date: string;
-  author: string;
-  authorImage?: string;
-  authorBio?: string;
-  imageUrl: string;
-  readTime?: string;
-  views?: number;
-  likes?: number;
-  created_at?: string;
-  updated_at?: string;
-}
+// ... keep existing code (interface definition)
 
 const Article = () => {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const [article, setArticle] = useState<Article | null>(null);
-  const [relatedArticles, setRelatedArticles] = useState<Article[]>([]);
-  const [loading, setLoading] = useState(true);
-  const isFirstRender = useRef(true);
-  
-  // Get the current URL for canonical and OG tags
-  const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
-  
-  useEffect(() => {
-    // Redirect HTTP to HTTPS
-    if (typeof window !== 'undefined' && window.location.protocol === 'http:' && window.location.hostname !== 'localhost') {
-      window.location.href = window.location.href.replace('http:', 'https:');
-      return;
-    }
+  // ... keep existing code (state variables and URL logic)
+  const location = useLocation();
 
-    // Fetch the article from Supabase
-    const fetchArticle = async () => {
-      if (!id) return;
-      
-      setLoading(true);
-      
-      try {
-        // Fetch the main article
-        const { data: articleData, error: articleError } = await supabase
-          .from('articles')
-          .select('*')
-          .eq('id', id)
-          .single();
-        
-        if (articleError) {
-          console.error('Error fetching article:', articleError);
-          setLoading(false);
-          return;
-        }
-        
-        // Format the article data
-        const formattedArticle = {
-          id: articleData.id,
-          title: articleData.title,
-          content: articleData.content || '',
-          excerpt: articleData.excerpt || '',
-          category: articleData.category,
-          date: articleData.date,
-          author: articleData.author,
-          authorImage: articleData.author_image,
-          authorBio: articleData.author_bio,
-          imageUrl: articleData.image_url,
-          readTime: articleData.read_time || '3 min',
-          views: articleData.views || 0,
-          likes: articleData.likes || 0,
-          created_at: articleData.created_at,
-          updated_at: articleData.updated_at
-        };
-        
-        setArticle(formattedArticle);
-        
-        // Fetch related articles in the same category
-        const { data: relatedData, error: relatedError } = await supabase
-          .from('articles')
-          .select('*')
-          .eq('category', articleData.category)
-          .neq('id', id)
-          .limit(3);
-        
-        if (!relatedError && relatedData) {
-          const formattedRelated = relatedData.map(item => ({
-            id: item.id,
-            title: item.title,
-            excerpt: item.excerpt || '',
-            category: item.category,
-            date: item.date,
-            author: item.author,
-            imageUrl: item.image_url,
-            readTime: item.read_time
-          }));
-          
-          setRelatedArticles(formattedRelated);
-        }
-      } catch (error) {
-        console.error('Error loading article:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    // Scroll to top when article loads
-    window.scrollTo(0, 0);
-    fetchArticle();
-  }, [id]);
-
-  // Update view count when the article is viewed
-  useEffect(() => {
-    const updateViewCount = async () => {
-      if (!article || !id || !isFirstRender.current) return;
-      
-      // Check if this article has been viewed in this session
-      const viewedArticles = JSON.parse(localStorage.getItem('viewedArticles') || '{}');
-      
-      if (!viewedArticles[id]) {
-        // Mark as viewed
-        viewedArticles[id] = true;
-        localStorage.setItem('viewedArticles', JSON.stringify(viewedArticles));
-        
-        // Update view count in Supabase
-        const newViewCount = article.views ? article.views + 1 : 1;
-        
-        try {
-          await supabase
-            .from('articles')
-            .update({ views: newViewCount })
-            .eq('id', id);
-            
-          // Update local state
-          setArticle(prev => prev ? {...prev, views: newViewCount} : null);
-        } catch (error) {
-          console.error('Error updating view count:', error);
-        }
-      }
-      
-      isFirstRender.current = false;
-    };
-    
-    updateViewCount();
-  }, [article, id]);
+  // ... keep existing code (useEffect for fetching articles and view count)
 
   if (loading) {
     return (
       <div className="flex min-h-screen flex-col">
-        <SEOHead title="Loading Article | Times Roman" />
+        <SEOHead 
+          title="Loading Article | Times Roman" 
+          description="Loading the latest news article from Times Roman."
+          noIndex={true}
+        />
         <Navbar />
         <main className="container mx-auto flex-1 px-4 py-8">
           <div className="flex flex-col items-center justify-center py-12">
@@ -176,7 +43,8 @@ const Article = () => {
       <div className="flex min-h-screen flex-col">
         <SEOHead 
           title="Article Not Found | Times Roman" 
-          description="The article you're looking for doesn't exist or has been removed." 
+          description="The article you're looking for doesn't exist or has been removed from Times Roman news."
+          noIndex={true}
         />
         <Navbar />
         <main className="container mx-auto flex-1 px-4 py-8">
@@ -197,63 +65,33 @@ const Article = () => {
     );
   }
 
-  // Standardize article format to ensure all required fields exist
-  const standardizedArticle = {
-    id: article.id,
-    title: article.title,
-    content: article.content || '',
-    excerpt: article.excerpt || '',
-    category: article.category,
-    date: article.date,
-    author: article.author,
-    authorImage: article.authorImage || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80',
-    authorBio: article.authorBio || 'Times Roman Editorial Team',
-    imageUrl: article.imageUrl,
-    readTime: article.readTime || '3 min',
-    views: article.views || 0,
-    likes: article.likes || 0,
-    created_at: article.created_at || new Date().toISOString(),
-    updated_at: article.updated_at || new Date().toISOString()
-  };
+  // ... keep existing code (standardized article)
 
-  // Generate article excerpt for social sharing
-  const getArticleDescription = () => {
-    if (article.excerpt && article.excerpt.trim().length > 0) {
-      return article.excerpt;
-    }
-    
-    // If no excerpt, extract text from the first paragraph(s) of content
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = article.content || '';
-    const paragraphs = tempDiv.querySelectorAll('p');
-    if (paragraphs.length > 0) {
-      const firstParagraphText = paragraphs[0].textContent || '';
-      return firstParagraphText.substring(0, 160) + (firstParagraphText.length > 160 ? '...' : '');
-    }
-    
-    // Fallback description
-    return `Read about ${article.title} in our ${article.category} section.`;
-  };
-
-  // Get the article description for sharing
-  const articleDescription = getArticleDescription();
+  // Enhanced SEO data for article page
+  const articleDescription = generateMetaDescription(
+    article.excerpt || '', 
+    article.content || '', 
+    article.title
+  );
   
-  // Strip HTML tags for article body in structured data
-  const stripHtml = (html) => {
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = html;
-    return tempDiv.textContent || tempDiv.innerText || '';
-  };
-
-  // For JSON-LD structured data
-  const articleContent = stripHtml(article.content);
+  const articleKeywords = generateArticleKeywords(
+    article.title, 
+    article.content || '', 
+    article.category
+  );
+  
+  const articleBreadcrumbs = generateBreadcrumbs(location.pathname, article.title);
+  
+  const optimizedImageUrl = optimizeImageUrl(article.imageUrl, 1200, 630);
+  
+  // ... keep existing code (strip HTML function)
 
   return (
     <div className="flex min-h-screen flex-col">
       <SEOHead 
         title={`${article.title} | Times Roman`}
         description={articleDescription}
-        ogImage={article.imageUrl}
+        ogImage={optimizedImageUrl}
         ogType="article"
         canonical={currentUrl}
         isArticle={true}
@@ -262,53 +100,21 @@ const Article = () => {
           modifiedTime: standardizedArticle.updated_at,
           author: article.author,
           category: article.category,
-          content: articleContent
+          content: articleContent,
+          tags: articleKeywords
         }}
         publisherInfo={{
           name: 'Times Roman',
-          logo: 'https://i.ibb.co/Z6ffRH7K/Timesromancir-logo.png'
+          logo: 'https://i.ibb.co/Z6ffRH7K/Timesromancir-logo.png',
+          url: 'https://timesroman.in'
         }}
+        breadcrumbs={articleBreadcrumbs}
+        keywords={articleKeywords}
       />
       <ReadingProgressBar />
       <Navbar />
       
-      <main className="flex-1">
-        <article className="article-container">
-          <ArticlePage {...standardizedArticle} />
-        </article>
-        
-        {/* Ad slot between article and related content */}
-        <div className="bg-gray-100 py-6 text-center">
-          <div className="container mx-auto px-4">
-            <div className="rounded-lg border border-dashed border-gray-300 bg-white p-4 shadow-sm">
-              <p className="text-gray-500">Advertisement</p>
-              <div className="mx-auto h-[250px] max-w-[300px] bg-gray-200 flex items-center justify-center">
-                <span className="text-gray-500">Ad Slot - 300x250</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Related Articles Section */}
-        <section className="bg-gray-50 py-12 animate-[fadeIn_1s_ease-in-out]">
-          <div className="container mx-auto px-4">
-            <h2 className="mb-6 font-serif text-2xl font-bold">Related Articles</h2>
-            {relatedArticles.length > 0 ? (
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                {relatedArticles.map((article) => (
-                  <ArticleCard 
-                    key={article.id} 
-                    {...article} 
-                    className="transform transition-all hover:translate-y-[-8px]" 
-                  />
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-600">No related articles found.</p>
-            )}
-          </div>
-        </section>
-      </main>
+      {/* ... keep existing code (main content) */}
       
       <Footer />
     </div>
