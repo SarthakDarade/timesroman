@@ -11,23 +11,27 @@ interface Article {
   id: string;
   title: string;
   excerpt: string;
+  content: string;
+  image_url: string;
+  author: string;
   category: string;
+  created_at: string;
+  updated_at: string;
+  views: number;
   date: string;
-  imageUrl: string;
-  readTime?: string;
 }
 
 interface CategorySectionProps {
   title: string;
-  categoryPath: string;
   articles: Article[];
+  categoryId?: string;
   loading?: boolean;
 }
 
 const CategorySection: React.FC<CategorySectionProps> = ({
   title,
-  categoryPath,
   articles,
+  categoryId,
   loading = false,
 }) => {
   // Get gradient background based on title
@@ -84,6 +88,8 @@ const CategorySection: React.FC<CategorySectionProps> = ({
     }
   };
 
+  const categoryPath = `/category/${categoryId || title.toLowerCase().replace(/\s+/g, '-')}`;
+
   return (
     <section className={`py-8 md:py-12 ${getGradientClass()}`}>
       <div className="container mx-auto px-4">
@@ -128,7 +134,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                     className="animate-[fadeIn_0.5s_ease-in-out]" 
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
-                    <ArticleCard {...article} />
+                    <ArticleCard article={article} />
                   </div>
                 ))}
               </Suspense>
