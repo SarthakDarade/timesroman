@@ -8,114 +8,14 @@ import SEOHead from '../components/SEOHead';
 import { supabase } from '@/integrations/supabase/client';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { subscribeToArticleChanges } from '@/utils/realtimeHelpers';
+import { generateBreadcrumbs } from '@/utils/seoHelpers';
 
-// Lazy loaded components
-const ArticleCard = lazy(() => import('../components/ArticleCard'));
-
-interface Article {
-  id: string;
-  title: string;
-  excerpt: string;
-  content?: string;
-  category: string;
-  date: string;
-  author?: string;
-  imageUrl: string;
-  readTime?: string;
-}
+// ... keep existing code (lazy loaded components and interfaces)
 
 const Index = () => {
-  const [featuredArticle, setFeaturedArticle] = useState<Article | null>(null);
-  const [latestArticles, setLatestArticles] = useState<Article[]>([]);
-  const [categoryArticles, setCategoryArticles] = useState<Record<string, Article[]>>({});
-  const [loading, setLoading] = useState(true);
-  const [categories, setCategories] = useState<string[]>([]);
-  const isMobile = useIsMobile();
-  
-  // Categories we want to display (in order)
-  const desiredCategories = [
-    'Latest News', 
-    'Politics', 
-    'Technology', 
-    'Technology News', 
-    'Business', 
-    'Business News', 
-    'World News', 
-    'US News', 
-    'India News', 
-    'Entertainment News', 
-    'Sports News', 
-    'Cricket', 
-    'Government News', 
-    'Press Releases'
-  ];
+  // ... keep existing code (state variables and desired categories)
 
-  // Fetch all articles
-  const fetchArticles = async () => {
-    setLoading(true);
-    
-    try {
-      // Fetch all articles
-      const { data, error } = await supabase
-        .from('articles')
-        .select('*')
-        .order('created_at', { ascending: false });
-        
-      if (error) {
-        console.error('Error fetching articles:', error);
-        return;
-      }
-      
-      // Format articles
-      const articles = data.map(article => ({
-        id: article.id,
-        title: article.title,
-        excerpt: article.excerpt || article.content?.substring(0, 120) || '',
-        content: article.content,
-        category: article.category,
-        date: article.date,
-        author: article.author,
-        imageUrl: article.image_url,
-        readTime: article.read_time
-      }));
-      
-      // Set featured article (first one for now)
-      setFeaturedArticle(articles[0] || null);
-      
-      // Set latest articles (excluding featured)
-      const latest = articles.slice(1, 5);
-      setLatestArticles(latest);
-      
-      // Group articles by category
-      const groupedByCategory: Record<string, Article[]> = {};
-      const availableCategories: string[] = [];
-      
-      articles.forEach(article => {
-        const category = article.category;
-        
-        if (!groupedByCategory[category]) {
-          groupedByCategory[category] = [];
-          availableCategories.push(category);
-        }
-        
-        if (groupedByCategory[category].length < 3) {
-          groupedByCategory[category].push(article);
-        }
-      });
-      
-      // Filter and sort categories according to desired order
-      const sortedCategories = desiredCategories.filter(
-        cat => availableCategories.includes(cat)
-      );
-      
-      setCategories(sortedCategories);
-      setCategoryArticles(groupedByCategory);
-    } catch (err) {
-      console.error('Error fetching articles:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // ... keep existing code (fetchArticles function)
 
   useEffect(() => {
     // Initial fetch
@@ -132,109 +32,35 @@ const Index = () => {
     };
   }, []);
 
-  // Fallback featured article when loading or no data
-  const fallbackFeaturedArticle = {
-    id: 'featured-1',
-    title: 'AI Revolution in Journalism: How Machine Learning is Reshaping News Media',
-    excerpt: 'Machine learning algorithms are transforming how news is gathered, analyzed and presented to audiences worldwide.',
-    category: 'Technology',
-    date: 'April 14, 2025',
-    imageUrl: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&q=80',
-  };
+  // Enhanced SEO data for homepage
+  const homepageBreadcrumbs = generateBreadcrumbs('/', 'Home');
+  const homepageKeywords = [
+    'times roman', 'breaking news india', 'latest news today', 'indian news portal',
+    'current affairs', 'news updates', 'political news', 'business news india',
+    'technology news', 'entertainment news', 'sports news india', 'world news',
+    'hindi news', 'english news india', 'news website', 'online news'
+  ];
+
+  // ... keep existing code (fallback featured article)
 
   return (
     <div className="flex min-h-screen flex-col">
       <SEOHead 
-        title="Times Roman News - Latest Breaking News, Headlines & Updates"
-        description="Stay informed with Times Roman: Read the latest news on politics, business, technology, entertainment, sports, world events and more. Breaking news updates, analysis and opinion."
+        title="Times Roman News - Breaking News, Latest Headlines & Updates from India"
+        description="Stay informed with Times Roman: Read the latest breaking news, headlines and updates on politics, business, technology, entertainment, sports, world events and more from India and around the globe."
         isArticle={false}
         publisherInfo={{
           name: 'Times Roman',
-          logo: 'https://i.ibb.co/Z6ffRH7K/Timesromancir-logo.png'
+          logo: 'https://i.ibb.co/Z6ffRH7K/Timesromancir-logo.png',
+          url: 'https://timesroman.in'
         }}
+        breadcrumbs={homepageBreadcrumbs}
+        keywords={homepageKeywords}
+        ogImage="https://i.ibb.co/Z6ffRH7K/Timesromancir-logo.png"
       />
       <Navbar />
       
-      <main className="flex-1">
-        {/* Hero Section with Featured Article */}
-        <section className="container mx-auto px-4 py-6 md:py-8">
-          <h1 className="sr-only">Times Roman News - Latest Headlines and Breaking News</h1>
-          {loading ? (
-            <div className="aspect-[16/9] w-full animate-pulse bg-gray-200 rounded-lg"></div>
-          ) : (
-            <FeaturedArticle {...(featuredArticle || fallbackFeaturedArticle)} />
-          )}
-        </section>
-        
-        {/* Advertisement Banner */}
-        <div className="bg-gray-100 py-4 text-center">
-          <div className="container mx-auto px-4">
-            <div className="rounded-lg border border-dashed border-gray-300 bg-white p-2 shadow-sm">
-              <p className="text-sm text-gray-500">Advertisement</p>
-              <div className="mx-auto h-[90px] w-full max-w-[728px] bg-gray-200 flex items-center justify-center">
-                <span className="text-gray-500">Ad Slot - 728x90</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Latest News Section */}
-        <section className="bg-gray-50 py-8">
-          <div className="container mx-auto px-4">
-            <h2 className="mb-6 font-serif text-2xl font-bold">Latest News</h2>
-            {loading ? (
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="animate-pulse">
-                    <div className="aspect-[16/10] w-full bg-gray-200 rounded-lg"></div>
-                    <div className="h-4 bg-gray-200 rounded mt-4"></div>
-                    <div className="h-4 bg-gray-200 rounded mt-2 w-3/4"></div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                <Suspense fallback={<div className="animate-pulse bg-gray-100 h-48 rounded-lg"></div>}>
-                  {latestArticles.map((article) => (
-                    <ArticleCard key={article.id} {...article} />
-                  ))}
-                </Suspense>
-              </div>
-            )}
-          </div>
-        </section>
-        
-        {/* Dynamic Category Sections - Only show desired categories */}
-        {categories.map((category, index) => {
-          const articles = categoryArticles[category] || [];
-          if (articles.length === 0) return null;
-          
-          return (
-            <div key={category} className={index % 2 === 0 ? '' : 'bg-gray-50'}>
-              <CategorySection
-                title={category}
-                categoryPath={`/category/${category.toLowerCase()}`}
-                articles={articles}
-                loading={loading}
-              />
-              
-              {/* Ad slot after every other category */}
-              {index % 2 === 1 && (
-                <div className="bg-white py-6 text-center">
-                  <div className="container mx-auto px-4">
-                    <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-2 shadow-sm">
-                      <p className="text-sm text-gray-500">Advertisement</p>
-                      <div className="mx-auto h-[250px] max-w-full bg-gray-200 flex items-center justify-center">
-                        <span className="text-gray-500">{isMobile ? 'Mobile Ad - 300x250' : 'Desktop Ad - 970x250'}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </main>
+      {/* ... keep existing code (main content) */}
       
       <Footer />
     </div>
