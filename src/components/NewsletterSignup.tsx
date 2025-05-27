@@ -1,74 +1,71 @@
 
 import React, { useState } from 'react';
 import { Mail, Send } from 'lucide-react';
-import { toast } from 'sonner';
 
 const NewsletterSignup: React.FC = () => {
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!email) {
-      toast.error('Please enter your email address');
-      return;
-    }
-
     setIsSubmitting(true);
     
     // Simulate API call
     setTimeout(() => {
-      toast.success('Thank you for subscribing to our newsletter!');
-      setEmail('');
       setIsSubmitting(false);
+      setIsSubscribed(true);
+      setEmail('');
     }, 1000);
   };
 
-  return (
-    <section className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-8 text-white">
-      <div className="max-w-2xl mx-auto text-center">
-        <div className="flex items-center justify-center mb-4">
-          <Mail className="h-8 w-8 mr-2" />
-          <h2 className="text-2xl font-bold">Stay Updated</h2>
+  if (isSubscribed) {
+    return (
+      <section className="bg-blue-50 py-12 px-4 rounded-lg">
+        <div className="max-w-md mx-auto text-center">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Mail className="h-8 w-8 text-green-600" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">Thank You!</h3>
+          <p className="text-gray-600">You've successfully subscribed to our newsletter.</p>
         </div>
-        
-        <p className="text-blue-100 mb-6">
-          Get the latest news and updates delivered straight to your inbox. 
-          Never miss important stories from Times Roman.
+      </section>
+    );
+  }
+
+  return (
+    <section className="bg-blue-50 py-12 px-4 rounded-lg">
+      <div className="max-w-md mx-auto text-center">
+        <Mail className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+        <h3 className="text-2xl font-bold text-gray-900 mb-2">Stay Updated</h3>
+        <p className="text-gray-600 mb-6">
+          Get the latest news and updates delivered straight to your inbox.
         </p>
         
-        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
           <input
             type="email"
+            placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email address"
-            className="flex-1 px-4 py-3 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white"
-            disabled={isSubmitting}
+            required
+            className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white transition-colors disabled:opacity-50"
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isSubmitting ? (
-              <div className="flex items-center">
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent mr-2"></div>
-                Subscribing...
-              </div>
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
             ) : (
-              <div className="flex items-center">
-                <Send className="h-4 w-4 mr-2" />
+              <>
+                <Send className="h-4 w-4" />
                 Subscribe
-              </div>
+              </>
             )}
           </button>
         </form>
-        
-        <p className="text-xs text-blue-100 mt-4">
-          We respect your privacy. Unsubscribe at any time.
-        </p>
       </div>
     </section>
   );
